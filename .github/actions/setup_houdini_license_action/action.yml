@@ -45,10 +45,13 @@ runs:
     - run: echo ${{ github.action_path }}
       shell: bash
 
-    - run: ls ${{ github.action_path }}
+    - run: echo ${GITHUB_ACTION_PATH}
       shell: bash
 
-    - run: python3.9 ${{ github.action_path }}/install_apprentice_keys.py ${{ inputs.client_id }} ${{ inputs.client_secret_key }} ${{ inputs.houdini_version }}
+  #  - run: ls ${{ github.action_path }}
+    #  shell: bash
+
+    - run: python3.9 ${GITHUB_ACTION_PATH}/install_apprentice_keys.py ${{ inputs.client_id }} ${{ inputs.client_secret_key }} ${{ inputs.houdini_version }}
       shell: bash
 
     - run: hserver -h localhost:1715
