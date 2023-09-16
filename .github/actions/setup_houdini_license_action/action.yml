@@ -42,15 +42,6 @@ runs:
     - run: sesinetd
       shell: bash
 
-    - run: echo ${{ github.action_path }}
-      shell: bash
-
-    - run: echo ${GITHUB_ACTION_PATH}
-      shell: bash
-
-  #  - run: ls ${{ github.action_path }}
-    #  shell: bash
-
     - run: python3.9 ${GITHUB_ACTION_PATH}/install_apprentice_keys.py ${{ inputs.client_id }} ${{ inputs.client_secret_key }} ${{ inputs.houdini_version }}
       shell: bash
 

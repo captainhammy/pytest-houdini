@@ -22,7 +22,7 @@ jobs:
         with:
           client_id: ${{ secrets.SESI_CLIENT_ID }}
           client_secret_key: ${{ secrets.SESI_SECRET_KEY }}
-          houdini_version: 19.5
+          houdini_version: "19.5"
 
       - name: Set up Python
         uses: actions/setup-python@v4
