@@ -1,0 +1,55 @@
+name: "Install Apprentice Licenses"
+description: "Install Houdini Apprentice licenses for the duration of the tests."
+branding:
+  icon: "arrow-up-right"
+  color: "orange"
+inputs:
+  client_id:
+    description: "The SideFX Web API client_id value to use."
+    required: true
+
+  client_secret_key:
+    description: "The SideFX Web API client_secret_key value to use."
+    required: true
+
+  houdini_version:
+    description: "The Houdini {major.minor} version to redeem a license for."
+    required: true
+
+runs:
+  using: "composite"
+
+  steps:
+    - if: inputs.client_id == ''
+      run: echo client_id is empty && exit 1
+      shell: bash
+
+    - if: inputs.client_secret_key == ''
+      run: echo client_secret_key is empty && exit 1
+      shell: bash
+
+    - if: inputs.houdini_version == ''
+      run: echo houdini_version is empty && exit 1
+      shell: bash
+
+    - uses: actions/setup-python@v4
+      with:
+        python-version: "pypy3.9"
+
+    - run: python3.9 -m pip install requests
+      shell: bash
+
+    - run: sesinetd
+      shell: bash
+
+    - run: echo ${{ github.action_path }}
+      shell: bash
+
+    - run: ls ${{ github.action_path }}
+      shell: bash
+
+    - run: python3.9 ${{ github.action_path }}/install_apprentice_keys.py ${{ inputs.client_id }} ${{ inputs.client_secret_key }} ${{ inputs.houdini_version }}
+      shell: bash
+
+    - run: hserver -h localhost:1715
+      shell: bash
