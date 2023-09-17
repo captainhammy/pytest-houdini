@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Install Apprentice Licenses
-        uses: captainhammy/install-houdini-apprentice-license-action@v2
+        uses: captainhammy/install-houdini-apprentice-license-action@v3
 #        uses: ./.github/actions/setup_houdini_license_action
         with:
           client_id: ${{ secrets.SESI_CLIENT_ID }}
