@@ -56,4 +56,7 @@ setup(
         "Programming Language :: Python :: 3.10",
         "Topic :: Software Development :: Testing",
     ],
+    project_urls={
+        "Documentation": "https://pytest-houdini.readthedocs.io/"
+    },
 )
