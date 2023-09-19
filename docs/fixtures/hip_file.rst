@@ -16,7 +16,7 @@ load_module_test_hip_file
 
 The ``load_module_test_hip_file`` fixture will load a test hip file with the same name as the running module.  It
 supports .hip, .hiplc, and .hipnc type files (in that order). The hip file must be under a **data/** directory which is
-a sibling of of test file. For this package, looking at the tests for the fixtures, we can see that we have a matching
+a sibling of the test file. For this package, looking at the tests for the fixtures, we can see that we have a matching
 hip file for ``test_nodes.py`` (``test_nodes.hiplc``).
 
 .. code-block::

@@ -17,13 +17,13 @@ The node search order is as follows:
 
 In the case of using the test class name, the class name component of the node name can match exactly or be lower case.
 
-For example, a simple test function named **test_myfunc** would attempt to find a node named **myfunc** under the desired
+For example, a simple test function named **test_myfunc** would attempt to find a node named **test_myfunc** under the desired
 parent node. In the example below this would be an Object node under "/obj".
 
 .. code-block:: python
 
     def test_myfunc(obj_test_node):
-        assert obj_test_node.path() == "/obj/myfunc"
+        assert obj_test_node.path() == "/obj/test_myfunc"
 
 
 For the following test class it is a bit more complicated:

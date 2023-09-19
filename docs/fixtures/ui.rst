@@ -7,13 +7,9 @@ UI
 mock_hdefereval
 ---------------
 
-The ``mock_hdefereval`` fixture mocks the ``hdefereval`` module which can have issues is in non-graphical Houdini.
-
-The ``mock_hdefereval`` fixture provides a ``MagicMock`` object representing the ``hdefereval`` module. This object has
-been monkeypatched into ``sys.modules`` for the duration of the test.
-
-If you need to test code which uses this module you'll want to use this fixture as importing the module in non-graphical
-Houdini (hython) will result in an ``ImportError`` due to the UI not being available.
+The ``mock_hdefereval`` fixture mocks the ``hdefereval`` module. If you need to test code which uses this module you'll
+want to use this fixture as importing the module in non-graphical Houdini (hython) will result in an ``ImportError`` due
+to the UI not being available.
 
 .. code-block::
 
@@ -35,9 +31,7 @@ Houdini (hython) will result in an ``ImportError`` due to the UI not being avail
 mock_hou_qt
 -----------
 
-The ``mock_hou_qt`` fixture mocks the ``hou.qt`` module which is not available in non-graphical Houdini.
-
-It will monkeypatch in and return a ``MagicMock`` object which represents the ``hou.qt`` module.
+The ``mock_hou_qt`` fixture mocks the ``hou.qt`` module which does not exist in non-graphical Houdini.
 
 The temporary ``hou.qt`` object is removed after the test is completed.
 
@@ -55,9 +49,7 @@ The temporary ``hou.qt`` object is removed after the test is completed.
 mock_hou_ui
 -----------
 
-The ``mock_hou_ui`` fixture mocks the ``hou.ui`` module which is not available in non-graphical Houdini.
-
-It will monkeypatch in and return a ``MagicMock`` object which represents the ``hou.ui`` module.
+The ``mock_hou_ui`` fixture mocks the ``hou.ui`` module which does not exist in non-graphical Houdini.
 
 The temporary ``hou.ui`` object is removed after the test is completed.
 
