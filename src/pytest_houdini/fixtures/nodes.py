@@ -40,7 +40,7 @@ def _find_matching_node(parent: hou.Node, request: pytest.FixtureRequest) -> hou
          RuntimeError: Will be raised if no matching node could be found.
 
     """
-    test_name = request.node.name
+    test_name = request.node.originalname
 
     # First try to find a node with the exact test name.
     names = [test_name]

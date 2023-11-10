@@ -3,6 +3,8 @@
 # Standard Library
 import importlib
 
+import pytest
+
 # pytest-houdini
 import pytest_houdini.fixtures.nodes
 
@@ -12,6 +14,37 @@ pytest_plugins = ["pytester"]
 
 
 # Tests
+
+def test_parametrized_node_names(pytester, shared_datadir):
+    """Test to ensure that the node names are correct when using fixtures along
+    with parametrized tests.
+
+    The test nodes will be found according to the original name,
+    test_obj_test_node_func, instead of test_obj_test_node_func[True|False].
+
+    """
+    test_hip = shared_datadir / "test_nodes.hiplc"
+
+    pytester.makepyfile(
+        f"""
+import pytest
+
+import hou
+
+hou.hipFile.load("{test_hip.as_posix()}", ignore_load_warnings=True)
+
+@pytest.mark.parametrize("extra_parm", (True, False))
+def test_obj_test_node_func(obj_test_node, extra_parm, request):
+    target_node = hou.node("/obj/test_obj_test_node_func")
+
+    assert target_node is not None
+    assert target_node == obj_test_node
+
+"""
+    )
+    result = pytester.runpytest()
+
+    result.assert_outcomes(passed=2)
 
 
 def test_obj_test_node(pytester, shared_datadir):
