@@ -22,7 +22,7 @@ def test_obj_test_node(pytester, shared_datadir):
         f"""
 import hou
 
-hou.hipFile.load("{test_hip.as_posix()}")
+hou.hipFile.load("{test_hip.as_posix()}", ignore_load_warnings=True)
 
 
 class TestNodes:
@@ -84,7 +84,7 @@ def test_obj_test_geo(pytester, shared_datadir):
         f"""
 import hou
 
-hou.hipFile.load("{test_hip.as_posix()}")
+hou.hipFile.load("{test_hip.as_posix()}", ignore_load_warnings=True)
 
 def test_obj_test_geo_missing(obj_test_geo):
     pass
@@ -113,7 +113,7 @@ def test_obj_test_geo_copy(pytester, shared_datadir):
         f"""
 import hou
 
-hou.hipFile.load("{test_hip.as_posix()}")
+hou.hipFile.load("{test_hip.as_posix()}", ignore_load_warnings=True)
 
 def test_obj_test_geo_copy(obj_test_geo_copy):
     target_node = hou.node('/obj/test_obj_test_geo_copy/TARGET')
@@ -137,7 +137,7 @@ def test_out_test_node(pytester, shared_datadir):
         f"""
 import hou
 
-hou.hipFile.load("{test_hip.as_posix()}")
+hou.hipFile.load("{test_hip.as_posix()}", ignore_load_warnings=True)
 
 def test_out_test_node(out_test_node):
     target_node = hou.node("/out/test_out_test_node")
