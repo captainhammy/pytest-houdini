@@ -4,10 +4,13 @@
 from __future__ import annotations
 
 # Standard Library
-from typing import TYPE_CHECKING, Callable, Union
+from typing import TYPE_CHECKING, Callable
 
 # Third Party
 import pytest
+
+# pytest-houdini
+from pytest_houdini.fixtures.exceptions import NoModuleTestFileError
 
 # Houdini
 import hou
@@ -20,7 +23,12 @@ if TYPE_CHECKING:
 
 @pytest.fixture
 def clear_hip_file() -> Generator[None, None, None]:
-    """Fixture to clear the current hip file before and after test running."""
+    """Fixture to clear the current hip file before and after test running.
+
+    >>> @pytest.mark.usefixtures("clear_hip_file")
+    ... def test_something():
+    ...     # Modify the scene state
+    """
     hou.hipFile.clear(suppress_save_prompt=True)
 
     yield
@@ -43,8 +51,7 @@ def load_module_test_hip_file(
     Example:
         Place the following line at the top of the test module::
 
-            pytestmark = pytest.mark.usefixtures("load_module_test_hip_file")
-
+        pytestmark = pytest.mark.usefixtures("load_module_test_hip_file")
     """
     test_file_path = request.path
 
@@ -64,13 +71,9 @@ def load_module_test_hip_file(
     # We didn't find a matching file so raise an exception indicating no file could be found
     # and include the various paths we tried.
     else:
-        raise RuntimeError(
-            f"Could not find a valid test hip: {data_dir}/{test_file_path.stem}{{{','.join(hip_extensions)}}}"
-        )
+        raise NoModuleTestFileError((data_dir / test_file_path.stem).as_posix(), hip_extensions)
 
-    hou.hipFile.load(
-        test_file_path.as_posix(), suppress_save_prompt=True, ignore_load_warnings=True
-    )
+    hou.hipFile.load(test_file_path.as_posix(), suppress_save_prompt=True, ignore_load_warnings=True)
 
     yield
 
@@ -84,11 +87,10 @@ def set_test_frame() -> Generator[Callable, None, None]:
     >>> def test_func(set_test_frame):
     ...    set_test_frame(1001)
     ...    # Do test things
-
     """
     current_frame = hou.frame()
 
-    def _set_test_frame(frame: Union[float, int]) -> None:
+    def _set_test_frame(frame: float) -> None:
         hou.setFrame(frame)
 
     yield _set_test_frame

@@ -4,38 +4,39 @@
 from __future__ import annotations
 
 # Standard Library
-from typing import TYPE_CHECKING, Callable
+from typing import Callable
 
 # Third Party
 import pytest
 
+# pytest-houdini
+from pytest_houdini.fixtures.exceptions import MissingToolError
+
 # Houdini
 import hou
-
-if TYPE_CHECKING:
-    from collections.abc import Generator
-
 
 # Fixtures
 
 
 @pytest.fixture
-def exec_shelf_tool_script() -> Generator[Callable, None, None]:
+def exec_shelf_tool_script() -> Callable:
     """Fixture to execute a shelf tool."""
 
     def _exec(tool_name: str, kwargs: dict) -> None:
         """Execute tool code inside a file.
 
-        :param tool_name: The name of the tool to execute.
-        :param kwargs: The global 'kwargs' dict for the tool execution.
-        :return:
+        Args:
+            tool_name: The name of the tool to execute.
+            kwargs: The global 'kwargs' dict for the tool execution.
 
+        Raises:
+            MissingToolError: If a tool of the name cannot be found.
         """
         tool = hou.shelves.tool(tool_name)
 
         if tool is None:
-            raise RuntimeError(f"Could not find tool: {tool_name}")
+            raise MissingToolError(tool_name)
 
-        exec(tool.script(), {"kwargs": kwargs})  # pylint: disable=exec-used
+        exec(tool.script(), {"kwargs": kwargs})
 
-    yield _exec
+    return _exec

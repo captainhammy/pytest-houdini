@@ -70,10 +70,11 @@ The temporary ``hou.ui`` object is removed after the test is completed.
 set_ui_available
 ----------------
 
-The ``set_ui_available`` fixtures forces the ``hou.isUIAvailable()`` function to return True.
+The ``set_ui_available`` fixture forces the ``hou.isUIAvailable()`` function to return True. It does **NOT**
+handle any mocking of *hou.ui*, however.
 
 .. code-block:: python
 
-    def test_ui_available(set_ui_available):
+    @pytest.mark.usefixtures("set_ui_available")
+    def test_ui_available():
         assert hou.isUIAvailable()
-

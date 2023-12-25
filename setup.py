@@ -11,7 +11,7 @@ DESCRIPTION = "pytest plugin for testing code in Houdini."
 URL = "https://github.com/captainhammy/pytest-houdini"
 AUTHOR = "Graham Thompson"
 AUTHOR_EMAIL = "captainhammy@gmail.com"
-REQUIRES_PYTHON = ">=3.7.0"
+REQUIRES_PYTHON = ">=3.9.0"
 
 this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
@@ -30,13 +30,13 @@ setup(
     packages=find_packages(where="src", exclude=("tests",)),
     install_requires=[
         "pytest",
+        "pytest-datadir",
+        "pytest-mock",
     ],
     extras_require={
         "test": [
-            "pytest",
+            "coverage",
             "pytest-cov",
-            "pytest-datadir",
-            "pytest-mock",
             "tox",
         ]
     },
@@ -50,10 +50,10 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3 :: Only",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
         "Topic :: Software Development :: Testing",
     ],
     project_urls={"Documentation": "https://pytest-houdini.readthedocs.io/"},

@@ -1,21 +1,17 @@
 """Initialize the pytest-houdini plugin."""
-# pylint: disable=unused-import
 
-# Try to import 'hou' to test that Houdini is running.
-try:
-    import hou
-
-except ImportError:
-    pass
+# Standard Library
+from importlib.util import find_spec
 
 # If Houdini is running then we can import our fixtures to expose.
-else:
+if find_spec("hou"):
     from pytest_houdini.fixtures.hip_file import (
         clear_hip_file,
         load_module_test_hip_file,
         set_test_frame,
     )
     from pytest_houdini.fixtures.nodes import (
+        create_temp_node,
         obj_test_geo,
         obj_test_geo_copy,
         obj_test_node,

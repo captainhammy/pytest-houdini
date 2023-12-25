@@ -4,10 +4,17 @@
 from __future__ import annotations
 
 # Standard Library
-from typing import TYPE_CHECKING
+import contextlib
+from typing import TYPE_CHECKING, Callable
 
 # Third Party
 import pytest
+
+# pytest-houdini
+from pytest_houdini.fixtures.exceptions import (
+    NoTestNodeError,
+    TestNodeDoesNotContainSOPsError,
+)
 
 # Houdini
 import hou
@@ -15,10 +22,11 @@ import hou
 if TYPE_CHECKING:
     from collections.abc import Generator
 
+
 # Non-Public Functions
 
 
-def _find_matching_node(parent: hou.Node, request: pytest.FixtureRequest) -> hou.Node:
+def _find_matching_node(parent: hou.OpNode, request: pytest.FixtureRequest) -> hou.OpNode:
     """Try to find a matching child node based on a test request.
 
     Node search order is as follows:
@@ -37,8 +45,7 @@ def _find_matching_node(parent: hou.Node, request: pytest.FixtureRequest) -> hou
         A child node matching the request, if any.
 
     Raises:
-         RuntimeError: Will be raised if no matching node could be found.
-
+         NoTestNodeError: Will be raised if no matching node could be found.
     """
     test_name = request.node.originalname
 
@@ -68,16 +75,48 @@ def _find_matching_node(parent: hou.Node, request: pytest.FixtureRequest) -> hou
         if node is not None:
             return node
 
-    raise RuntimeError(
-        f"Could not find any matching test nodes: {', '.join([parent.path() + '/' + name for name in names])}"
-    )
+    searched_paths = [parent.path() + "/" + name for name in names]
+
+    raise NoTestNodeError(searched_paths)
 
 
 # Fixtures
 
 
 @pytest.fixture
-def obj_test_node(request: pytest.FixtureRequest) -> Generator[hou.Node, None, None]:
+def create_temp_node() -> Generator[Callable, None, None]:
+    """Fixture to create a temporary node that will be destroyed on cleanup."""
+    _created_nodes: list[hou.Node] = []
+
+    def _create(
+        parent: hou.Node, node_type_name: str, node_name: str | None = None, *, run_init_scripts: bool = True
+    ) -> hou.Node:
+        """Function to create a test node that will be destroyed on cleanup.
+
+        Args:
+            parent: The parent to create the test node under.
+            node_type_name: The node type to create.
+            node_name: Optional node name.
+            run_init_scripts: Whether to run the node initialization scripts.
+
+        Return:
+            The created test node.
+        """
+        node = parent.createNode(node_type_name, node_name, run_init_scripts=run_init_scripts)
+
+        _created_nodes.append(node)
+
+        return node
+
+    yield _create
+
+    for created in _created_nodes:
+        with contextlib.suppress(hou.ObjectWasDeleted):
+            created.destroy()
+
+
+@pytest.fixture
+def obj_test_node(request: pytest.FixtureRequest) -> hou.OpNode:
     """Fixture to provide a node in /obj matching the test."""
     parent = hou.node("/obj")
 
@@ -85,16 +124,16 @@ def obj_test_node(request: pytest.FixtureRequest) -> Generator[hou.Node, None, N
 
 
 @pytest.fixture
-def obj_test_geo(obj_test_node: hou.Node) -> Generator[hou.Geometry, None, None]:
-    """Fixture to provide the display node geometry of a node in /obj matching the test."""
+def obj_test_geo(obj_test_node: hou.OpNode) -> hou.Geometry:
+    """Fixture to provide the read-only display node geometry of a node in /obj matching the test."""
     if obj_test_node.childTypeCategory() != hou.sopNodeTypeCategory():
-        raise RuntimeError(f"{obj_test_node.path()} does not contain SOP nodes")
+        raise TestNodeDoesNotContainSOPsError(obj_test_node)
 
     return obj_test_node.displayNode().geometry()
 
 
 @pytest.fixture
-def obj_test_geo_copy(obj_test_geo: hou.Node) -> Generator[hou.Geometry, None, None]:
+def obj_test_geo_copy(obj_test_geo: hou.Geometry) -> hou.Geometry:
     """Fixture to get a writable copy of the display node geometry of a node in /obj matching the test."""
     geo = hou.Geometry()
 
@@ -104,7 +143,7 @@ def obj_test_geo_copy(obj_test_geo: hou.Node) -> Generator[hou.Geometry, None, N
 
 
 @pytest.fixture
-def out_test_node(request: pytest.FixtureRequest) -> Generator[hou.Node, None, None]:
+def out_test_node(request: pytest.FixtureRequest) -> hou.OpNode:
     """Fixture to provide a node in /out matching the test."""
     parent = hou.node("/out")
 

@@ -12,17 +12,13 @@ from typing import TYPE_CHECKING, NamedTuple
 import pytest
 
 if TYPE_CHECKING:
-    from collections.abc import Generator
-
     from pytest_mock import MockerFixture
 
 # Fixtures
 
 
 @pytest.fixture
-def patch_soho(
-    monkeypatch: pytest.MonkeyPatch, mocker: MockerFixture
-) -> Generator[NamedTuple, None, None]:
+def patch_soho(monkeypatch: pytest.MonkeyPatch, mocker: MockerFixture) -> NamedTuple:
     """Mock importing of mantra/soho related modules.
 
     Available mocked modules are available via their original names from the fixture provided named tuple.
@@ -38,7 +34,6 @@ def patch_soho(
     >>> def test_soho_thing(patch_soho):
     ...     patch_soho.mantra.property.return_value = 3
     ...     # Test code
-
     """
     mock_api = mocker.MagicMock()
     mock_frame = mocker.MagicMock()
@@ -54,10 +49,6 @@ def patch_soho(
     monkeypatch.setitem(sys.modules, "mantra", mock_mantra)
     monkeypatch.setitem(sys.modules, "soho", mock_soho)
 
-    MockSoho = namedtuple(
-        "MockSoho", "IFDapi IFDframe IFDhooks IFDsettings mantra soho"
-    )
+    MockSoho = namedtuple("MockSoho", "IFDapi IFDframe IFDhooks IFDsettings mantra soho")
 
-    yield MockSoho(
-        mock_api, mock_frame, mock_hooks, mock_settings, mock_mantra, mock_soho
-    )
+    return MockSoho(mock_api, mock_frame, mock_hooks, mock_settings, mock_mantra, mock_soho)
