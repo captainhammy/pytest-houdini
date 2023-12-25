@@ -7,7 +7,7 @@ import pytest_houdini.tools
 
 
 def test_does_not_raise():
-    """Test pytest_houdini.tools.does_not_raise()
+    """Test pytest_houdini.tools.does_not_raise().
 
     This test is pretty useless and mostly just here for test coverage.
     """

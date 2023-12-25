@@ -3,10 +3,11 @@
 # Standard Library
 import importlib
 
-import pytest
-
 # pytest-houdini
 import pytest_houdini.fixtures.nodes
+
+# Houdini
+import hou
 
 importlib.reload(pytest_houdini.fixtures.nodes)
 
@@ -15,13 +16,69 @@ pytest_plugins = ["pytester"]
 
 # Tests
 
+
+def test_create_temp_node(pytester):
+    """Test the 'create_temp_node' fixture."""
+    pytester.makepyfile(
+        """
+import hou
+
+# Test the basic fixture behavior.
+def test_create_temp_node(create_temp_node):
+    assert hou.node("/obj").children() == ()
+
+    result = create_temp_node(hou.node("/obj"), "geo", "TEST_NODE")
+
+    assert hou.node("/obj").children() == (result, )
+
+    assert result.name() == "TEST_NODE"
+    assert result.parm("viewportlod") is not None
+
+
+# Test if we manually destroy the node instead of relying on automatic cleanup.
+# Also tests run_init_scripts arg passing.
+def test_create_temp_node_manual_destroy(create_temp_node):
+    assert hou.node("/obj").children() == ()
+
+    result = create_temp_node(hou.node("/obj"), "geo", "TEST_MANUAL_NODE", run_init_scripts=False)
+
+    assert hou.node("/obj").children() == (result, )
+
+    assert result.name() == "TEST_MANUAL_NODE"
+    assert result.parm("viewportlod") is None
+
+    result.destroy()
+
+
+# Test using the fixture to create multiple nodes.
+def test_create_temp_node_multiple(create_temp_node):
+    assert hou.node("/obj").children() == ()
+
+    result1 = create_temp_node(hou.node("/obj"), "geo", "TEST_NODE1")
+    result2 = create_temp_node(hou.node("/obj"), "null", "TEST_NODE2")
+
+    assert hou.node("/obj").children() == (result1, result2)
+
+
+# Sentinel test to ensure that the test code is run inprocess and that things
+# are being properly cleaned up.
+def test_sentinel():
+    hou.node("/obj").createNode("geo", "SENTINEL")
+
+"""
+    )
+    result = pytester.runpytest()
+
+    result.assert_outcomes(passed=4)
+
+    assert hou.node("/obj").children() == (hou.node("/obj/SENTINEL"),)
+
+
 def test_parametrized_node_names(pytester, shared_datadir):
-    """Test to ensure that the node names are correct when using fixtures along
-    with parametrized tests.
+    """Test to ensure node names are correct when using fixtures along with parametrized tests.
 
     The test nodes will be found according to the original name,
     test_obj_test_node_func, instead of test_obj_test_node_func[True|False].
-
     """
     test_hip = shared_datadir / "test_nodes.hiplc"
 

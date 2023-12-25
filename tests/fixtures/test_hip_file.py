@@ -23,12 +23,14 @@ pytest_plugins = ["pytester"]
 
 def test_clear_hip_file(pytester):
     """Test the 'clear_hip_file' fixture."""
-
     pytester.makepyfile(
         """
+import pytest
+
 import hou
 
-def test_clear_hip_file(clear_hip_file, request):
+@pytest.mark.usefixtures("clear_hip_file")
+def test_clear_hip_file(request):
     assert hou.node("/obj").children() == ()
 
     obj = hou.node("/obj")
@@ -57,10 +59,9 @@ def test_clear_hip_file(clear_hip_file, request):
     assert hou.node("/obj").children() == ()
 
 
-@pytest.mark.parametrize("ext", (".hip", ".hiplc", ".hipnc", None))
+@pytest.mark.parametrize("ext", [".hip", ".hiplc", ".hipnc", None])
 def test_load_module_test_hip_file(pytester, ext, shared_datadir):
     """Test the 'load_module_test_hip_file' fixture."""
-
     data_dir = pytester.mkdir("data")
 
     expected_path = "untitled.hip"
@@ -98,7 +99,6 @@ def test_load_module_test_hip_file():
 
 def test_set_test_frame(pytester):
     """Test the 'set_test_frame' fixture."""
-
     pytester.makepyfile(
         """
 import hou

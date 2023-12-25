@@ -15,7 +15,7 @@ load_module_test_hip_file
 -------------------------
 
 The ``load_module_test_hip_file`` fixture will load a test hip file with the same name as the running module.  It
-supports .hip, .hiplc, and .hipnc type files (in that order). The hip file must be under a **data/** directory which is
+supports .hip, .hiplc, and .hipnc file types (in that order). The hip file must be under a **data/** directory which is
 a sibling of the test file. For this package, looking at the tests for the fixtures, we can see that we have a matching
 hip file for ``test_nodes.py`` (``test_nodes.hiplc``).
 
@@ -36,19 +36,19 @@ hip file for ``test_nodes.py`` (``test_nodes.hiplc``).
 
 The fixture will also clear the hip file after the tests are completed.
 
-As this is a **module** level fixture, to use it ensure you've added the following at the top of the test file:
+As this is a **module** level fixture, to use it, ensure you've added the following at the top of the test file:
 
 .. code-block:: python
 
     pytestmark = pytest.mark.usefixtures("load_module_test_hip_file")
 
 
-In the event the fixture cannot find a matching file, the raised ``RuntimeError`` will contain a list of all the paths
-which were tried:
+In the event the fixture cannot find a matching file, the raised ``NoModuleTestFileError`` will contain a list of all
+the paths which were tried:
 
 .. code-block:: python
 
-    RuntimeError: Could not find a valid test hip: {test_file_dir}/data/{test_file_name}{.hip,.hiplc,.hipnc}
+    NoModuleTestFileError: Could not find a valid test hip: {test_file_dir}/data/{test_file_name}{.hip,.hiplc,.hipnc}
 
 
 set_test_frame

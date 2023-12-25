@@ -22,6 +22,7 @@ def test_exec_shelf_tool_script(pytester, shared_datadir):
         f"""
 import pytest
 
+from pytest_houdini.fixtures.exceptions import MissingToolError
 from pytest_houdini.tools import does_not_raise
 
 import hou
@@ -29,7 +30,7 @@ import hou
 @pytest.mark.parametrize(
     "tool_name, raiser",
     (
-        ("_not_a_tool_", pytest.raises(RuntimeError)),
+        ("_not_a_tool_", pytest.raises(MissingToolError)),
         ("pytest_houdini_test_tool", does_not_raise()),
     )
 )

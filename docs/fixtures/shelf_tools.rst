@@ -15,6 +15,8 @@ that would be passed to the shelf tool by Houdini.
 
 In order for this fixture to work, the shelf tool must already be loaded in the Houdini session.
 
+If a tool of the name cannot be found, a ``MissingToolError`` is raised.
+
 Consider the following simple tool definition where the execution sets a value in the kwargs dict:
 
 .. code-block:: xml

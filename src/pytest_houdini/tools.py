@@ -41,6 +41,5 @@ def does_not_raise() -> Generator[None, None, None]:
             result = divider(1, value)
 
             assert result == expected
-
     """
     yield
