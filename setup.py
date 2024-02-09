@@ -35,7 +35,6 @@ setup(
     ],
     extras_require={
         "test": [
-            "coverage",
             "pytest-cov",
             "tox",
         ]
