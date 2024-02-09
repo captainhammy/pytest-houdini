@@ -57,17 +57,17 @@ def _find_matching_node(parent: hou.OpNode, request: pytest.FixtureRequest) -> h
 
         test_name = test_name[5:]
 
-        # Look for a node with the class name + test name (minus test_ from function name)
-        names.append(f"{cls_name}_{test_name}")
-        names.append(f"{cls_name.lower()}_{test_name}")
-
-        # Also support the test node being under a parent node based on the class name.
-        names.append(f"{cls_name}/{test_name}")
-        names.append(f"{cls_name.lower()}/{test_name}")
-
-        # Finally try to find a node with the class name.
-        names.append(cls_name)
-        names.append(cls_name.lower())
+        names.extend([
+            # Look for a node with the class name + test name (minus test_ from function name)
+            f"{cls_name}_{test_name}",
+            f"{cls_name.lower()}_{test_name}",
+            # Also support the test node being under a parent node based on the class name.
+            f"{cls_name}/{test_name}",
+            f"{cls_name.lower()}/{test_name}",
+            # Finally try to find a node with the class name.
+            cls_name,
+            cls_name.lower(),
+        ])
 
     for name in names:
         node = parent.node(name)

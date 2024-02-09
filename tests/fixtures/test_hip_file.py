@@ -23,8 +23,7 @@ pytest_plugins = ["pytester"]
 
 def test_clear_hip_file(pytester):
     """Test the 'clear_hip_file' fixture."""
-    pytester.makepyfile(
-        """
+    pytester.makepyfile("""
 import pytest
 
 import hou
@@ -36,8 +35,7 @@ def test_clear_hip_file(request):
     obj = hou.node("/obj")
     obj.createNode("null")
 
-"""
-    )
+""")
 
     # Create a node under /obj so there will be something there before the fixture
     # clears the hip file on setup.
@@ -75,8 +73,7 @@ def test_load_module_test_hip_file(pytester, ext, shared_datadir):
 
         expected_path = hip_path.as_posix()
 
-    pytester.makepyfile(
-        f"""
+    pytester.makepyfile(f"""
 import pytest
 
 import hou
@@ -86,8 +83,7 @@ pytestmark = pytest.mark.usefixtures("load_module_test_hip_file")
 def test_load_module_test_hip_file():
     assert hou.hipFile.path() == "{expected_path}"
 
-"""
-    )
+""")
     result = pytester.runpytest()
 
     if ext is None:
@@ -99,8 +95,7 @@ def test_load_module_test_hip_file():
 
 def test_set_test_frame(pytester):
     """Test the 'set_test_frame' fixture."""
-    pytester.makepyfile(
-        """
+    pytester.makepyfile("""
 import hou
 
 def test_set_test_frame(set_test_frame):
@@ -108,8 +103,7 @@ def test_set_test_frame(set_test_frame):
 
     assert hou.frame() == 102
 
-"""
-    )
+""")
 
     hou.setFrame(101)
 

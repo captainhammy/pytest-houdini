@@ -16,8 +16,7 @@ pytest_plugins = ["pytester"]
 
 def test_patch_soho(pytester):
     """Test the 'patch_soho' fixture."""
-    pytester.makepyfile(
-        """
+    pytester.makepyfile("""
 import hou
 
 def test_patch_soho(patch_soho):
@@ -36,8 +35,7 @@ def test_patch_soho(patch_soho):
     import soho
     assert soho == patch_soho.soho
 
-"""
-    )
+""")
     result = pytester.runpytest()
 
     result.assert_outcomes(passed=1)
