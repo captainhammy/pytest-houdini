@@ -56,5 +56,5 @@ build
 dist
 *egg-info*
 
-tests/fixtures/data/backup
+**/backup/*.hip*
 
