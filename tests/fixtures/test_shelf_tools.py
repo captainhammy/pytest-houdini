@@ -18,8 +18,7 @@ def test_exec_shelf_tool_script(pytester, shared_datadir):
     """Test the 'exec_shelf_tool_script' fixture."""
     shelf_test_file = shared_datadir / "test_shelf_files.shelf"
 
-    pytester.makepyfile(
-        f"""
+    pytester.makepyfile(f"""
 import pytest
 
 from pytest_houdini.fixtures.exceptions import MissingToolError
@@ -43,8 +42,7 @@ def test_exec_shelf_tool_script(exec_shelf_tool_script, tool_name, raiser):
         exec_shelf_tool_script(tool_name, scriptargs)
 
         assert scriptargs["result"]
-"""
-    )
+""")
     result = pytester.runpytest()
 
     result.assert_outcomes(passed=2)

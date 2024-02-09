@@ -16,8 +16,7 @@ pytest_plugins = ["pytester"]
 
 def test_mock_hdefereval(pytester):
     """Test the 'mock_hdefereval' fixture."""
-    pytester.makepyfile(
-        """
+    pytester.makepyfile("""
 import hou
 
 def test_mock_hdefereval(mock_hdefereval):
@@ -25,8 +24,7 @@ def test_mock_hdefereval(mock_hdefereval):
 
     assert hdefereval == mock_hdefereval
 
-"""
-    )
+""")
     result = pytester.runpytest()
 
     result.assert_outcomes(passed=1)
@@ -34,8 +32,7 @@ def test_mock_hdefereval(mock_hdefereval):
 
 def test_mock_hou_qt(pytester):
     """Test the 'mock_hou_qt' fixture."""
-    pytester.makepyfile(
-        """
+    pytester.makepyfile("""
 import hou
 
 # Ensure hou.qt does not exist before any manipulation of it.
@@ -51,8 +48,7 @@ def test_mock_hou_qt(mock_hou_qt):
 def test_no_post_qt():
     assert not hasattr(hou, "qt")
 
-"""
-    )
+""")
     result = pytester.runpytest()
 
     result.assert_outcomes(passed=3)
@@ -60,8 +56,7 @@ def test_no_post_qt():
 
 def test_mock_hou_ui(pytester):
     """Test the 'mock_hou_ui' fixture."""
-    pytester.makepyfile(
-        """
+    pytester.makepyfile("""
 import hou
 
 # Ensure hou.ui does not exist before any manipulation of it.
@@ -77,8 +72,7 @@ def test_mock_hou_ui(mock_hou_ui):
 def test_no_post_ui():
     assert not hasattr(hou, "ui")
 
-"""
-    )
+""")
     result = pytester.runpytest()
 
     result.assert_outcomes(passed=3)
@@ -86,8 +80,7 @@ def test_no_post_ui():
 
 def test_set_ui_available(pytester):
     """Test the 'set_ui_available' fixture."""
-    pytester.makepyfile(
-        """
+    pytester.makepyfile("""
 import pytest
 
 import hou
@@ -96,8 +89,7 @@ import hou
 def test_set_ui_available():
     assert hou.isUIAvailable()
 
-"""
-    )
+""")
     result = pytester.runpytest()
 
     result.assert_outcomes(passed=1)

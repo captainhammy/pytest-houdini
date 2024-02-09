@@ -5,8 +5,7 @@ from __future__ import annotations
 
 # Standard Library
 import sys
-from collections import namedtuple
-from typing import TYPE_CHECKING, NamedTuple
+from typing import TYPE_CHECKING, Any, NamedTuple
 
 # Third Party
 import pytest
@@ -49,6 +48,12 @@ def patch_soho(monkeypatch: pytest.MonkeyPatch, mocker: MockerFixture) -> NamedT
     monkeypatch.setitem(sys.modules, "mantra", mock_mantra)
     monkeypatch.setitem(sys.modules, "soho", mock_soho)
 
-    MockSoho = namedtuple("MockSoho", "IFDapi IFDframe IFDhooks IFDsettings mantra soho")
+    class MockSoho(NamedTuple):
+        IFDapi: Any
+        IFDframe: Any
+        IFDhooks: Any
+        IFDsettings: Any
+        mantra: Any
+        soho: Any
 
     return MockSoho(mock_api, mock_frame, mock_hooks, mock_settings, mock_mantra, mock_soho)

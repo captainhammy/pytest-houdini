@@ -19,8 +19,7 @@ pytest_plugins = ["pytester"]
 
 def test_create_temp_node(pytester):
     """Test the 'create_temp_node' fixture."""
-    pytester.makepyfile(
-        """
+    pytester.makepyfile("""
 import hou
 
 # Test the basic fixture behavior.
@@ -65,8 +64,7 @@ def test_create_temp_node_multiple(create_temp_node):
 def test_sentinel():
     hou.node("/obj").createNode("geo", "SENTINEL")
 
-"""
-    )
+""")
     result = pytester.runpytest()
 
     result.assert_outcomes(passed=4)
@@ -82,8 +80,7 @@ def test_parametrized_node_names(pytester, shared_datadir):
     """
     test_hip = shared_datadir / "test_nodes.hiplc"
 
-    pytester.makepyfile(
-        f"""
+    pytester.makepyfile(f"""
 import pytest
 
 import hou
@@ -97,8 +94,7 @@ def test_obj_test_node_func(obj_test_node, extra_parm, request):
     assert target_node is not None
     assert target_node == obj_test_node
 
-"""
-    )
+""")
     result = pytester.runpytest()
 
     result.assert_outcomes(passed=2)
@@ -108,8 +104,7 @@ def test_obj_test_node(pytester, shared_datadir):
     """Test the 'obj_test_node' fixture."""
     test_hip = shared_datadir / "test_nodes.hiplc"
 
-    pytester.makepyfile(
-        f"""
+    pytester.makepyfile(f"""
 import hou
 
 hou.hipFile.load("{test_hip.as_posix()}", ignore_load_warnings=True)
@@ -159,8 +154,7 @@ def test_obj_test_node_func(obj_test_node):
 def test_no_matching(obj_test_node):
     pass
 
-"""
-    )
+""")
     result = pytester.runpytest()
 
     result.assert_outcomes(passed=7, errors=1)
@@ -170,8 +164,7 @@ def test_obj_test_geo(pytester, shared_datadir):
     """Test the 'obj_test_geo' fixture."""
     test_hip = shared_datadir / "test_nodes.hiplc"
 
-    pytester.makepyfile(
-        f"""
+    pytester.makepyfile(f"""
 import hou
 
 hou.hipFile.load("{test_hip.as_posix()}", ignore_load_warnings=True)
@@ -188,8 +181,7 @@ def test_obj_test_geo(obj_test_geo):
     assert obj_test_geo.sopNode() == target_node
     assert obj_test_geo.isReadOnly()
 
-"""
-    )
+""")
     result = pytester.runpytest()
 
     result.assert_outcomes(passed=1, errors=2)
@@ -199,8 +191,7 @@ def test_obj_test_geo_copy(pytester, shared_datadir):
     """Test the 'obj_test_geo_copy' fixture."""
     test_hip = shared_datadir / "test_nodes.hiplc"
 
-    pytester.makepyfile(
-        f"""
+    pytester.makepyfile(f"""
 import hou
 
 hou.hipFile.load("{test_hip.as_posix()}", ignore_load_warnings=True)
@@ -212,8 +203,7 @@ def test_obj_test_geo_copy(obj_test_geo_copy):
     assert not obj_test_geo_copy.isReadOnly()
     assert obj_test_geo_copy.intrinsicValue("pointcount") == target_node.geometry().intrinsicValue("pointcount")
 
-"""
-    )
+""")
     result = pytester.runpytest()
 
     result.assert_outcomes(passed=1)
@@ -223,8 +213,7 @@ def test_out_test_node(pytester, shared_datadir):
     """Test the 'out_test_node' fixture."""
     test_hip = shared_datadir / "test_nodes.hiplc"
 
-    pytester.makepyfile(
-        f"""
+    pytester.makepyfile(f"""
 import hou
 
 hou.hipFile.load("{test_hip.as_posix()}", ignore_load_warnings=True)
@@ -235,8 +224,7 @@ def test_out_test_node(out_test_node):
     assert target_node is not None
     assert target_node == out_test_node
 
-"""
-    )
+""")
     result = pytester.runpytest()
 
     result.assert_outcomes(passed=1)

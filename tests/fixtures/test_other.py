@@ -16,8 +16,7 @@ pytest_plugins = ["pytester"]
 
 def test_remove_abstract_methods(pytester, shared_datadir):
     """Test the 'remove_abstract_methods' fixture."""
-    pytester.makepyfile(
-        """
+    pytester.makepyfile("""
 import abc
 
 def test_remove_abstract_methods(remove_abstract_methods):
@@ -35,8 +34,7 @@ def test_remove_abstract_methods(remove_abstract_methods):
     f = TestClass()
     f.foo()
 
-"""
-    )
+""")
     result = pytester.runpytest()
 
     result.assert_outcomes(passed=1)

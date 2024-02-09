@@ -95,6 +95,8 @@
             "PTH",  # flake8-use-pathlib
             "RUF",  # Ruff specific
             "FBT",  # flake8-boolean-trap
+            "FURB",  # refurb
+            "PYI",  # flake8-pyi
         ]
         ignore = [
             "D104",  # Missing docstring in public module
