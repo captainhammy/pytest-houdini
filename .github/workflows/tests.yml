@@ -21,10 +21,10 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: pypy${{ matrix.python-version }}
 
@@ -40,7 +40,11 @@ jobs:
       - name: Test with tox
         run: tox
 
+      - name: Workaround for codecov/feedback#263
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
