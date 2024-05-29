@@ -11,22 +11,13 @@ jobs:
     strategy:
       matrix:
         houdini-version: ["20.0", "19.5"]
-        include:
-          - houdini-version: "20.0"
-            python-version: "3.10"
-          - houdini-version: "19.5"
-            python-version: "3.9"
+
     container:
       image: captainhammy/hython-runner:${{ matrix.houdini-version }}
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: pypy${{ matrix.python-version }}
 
       - name: Install Apprentice Licenses
         uses: captainhammy/install-houdini-apprentice-license-action@v5
@@ -35,7 +26,7 @@ jobs:
           client_secret_key: ${{ secrets.SESI_SECRET_KEY }}
 
       - name: Install dependencies
-        run: python${{ matrix.python-version }} -m pip install tox tox-gh-actions
+        run: python3 -m pip install tox tox-gh-actions
 
       - name: Test with tox
         run: tox
