@@ -24,7 +24,7 @@ import hou
         (hou.lopNodeTypeCategory(), nullcontext(), hou.node("/stage")),
         (hou.shopNodeTypeCategory(), nullcontext(), hou.node("/shop")),
         (hou.cop2NodeTypeCategory(), nullcontext(), hou.nodeType("CopNet/img")),
-        (hou.nodeTypeCategories().get("Cop"), nullcontext(), hou.nodeType("CopNet/copnet")),
+        # (hou.copNodeTypeCategory(), nullcontext(), hou.nodeType("CopNet/copnet")),
         (hou.sopNodeTypeCategory(), nullcontext(), hou.nodeType("Object/geo")),
         (hou.dopNodeTypeCategory(), nullcontext(), hou.nodeType("Object/dopnet")),
         (hou.topNodeTypeCategory(), nullcontext(), hou.nodeType("Object/topnet")),
