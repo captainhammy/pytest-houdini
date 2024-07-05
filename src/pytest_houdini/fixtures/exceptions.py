@@ -1,4 +1,4 @@
-"""Exceptions raised by pytest-houdini."""
+"""Exceptions raised by pytest-houdini fixtures."""
 
 # Future
 from __future__ import annotations

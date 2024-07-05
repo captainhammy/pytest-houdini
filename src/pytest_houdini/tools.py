@@ -7,6 +7,12 @@ from __future__ import annotations
 from contextlib import contextmanager
 from typing import TYPE_CHECKING
 
+# pytest-houdini
+from pytest_houdini.exceptions import UnsupportedCategoryError
+
+# Houdini
+import hou
+
 if TYPE_CHECKING:
     from collections.abc import Generator
 
@@ -15,31 +21,61 @@ if TYPE_CHECKING:
 
 
 @contextmanager
-def does_not_raise() -> Generator[None, None, None]:
-    """Dummy context manager for testing.
+def context_container(category: hou.NodeTypeCategory) -> Generator[hou.OpNode, None, None]:
+    """Context manager that provides an appropriate node to create a node under.
 
-    You can use this to help parametrize tests which may or may not raise exceptions.
+    If the container type needs to be created it will be, then it will be destroyed after
+    the scope of the manager.
 
-    Consider the below test for a function which divides two values. As it does not
-    validate any of the values it will result in ZeroDivisionError if value2 is 0. We
-    can use does_not_raise() in conjunction with pytest.raises(ZeroDivisionError) in order
-    to test a bunch of values and handle any expected exceptions.
+    >>> with context_container(hou.sopNodeTypeCategory()) as container:
+    ...     container.createNode("box")
 
-    def divider(value1, value2):
-        return value1 / value2
+    Args:
+        category: The node type category of the node to create.
 
-    @pytest.mark.parametrize(
-        "value, expected, tester",
-        [
-            (0, None, pytest.raises(ZeroDivisionError)),
-            (3.0, 0.3333333333333333, does_not_raise()),
-        ],
-    )
-    def test_divider(value, tester):
+    Returns:
+        An appropriate parent node to create a node of the desired type under.
 
-        with tester:
-            result = divider(1, value)
-
-            assert result == expected
+    Raises:
+        ValueError: Raised if the category does not correspond to a known type.
     """
-    yield
+    category_name = category.name()
+
+    # Types which can map directly to default scene nodes.
+    direct_mappings = {
+        "Driver": hou.node("/out"),
+        "Lop": hou.node("/stage"),
+        "Object": hou.node("/obj"),
+        "Shop": hou.node("/shop"),
+        "Vop": hou.node("/mat"),
+    }
+
+    container = direct_mappings.get(category_name)
+
+    # If there was a direct mapping then use it.
+    if container is not None:
+        yield container
+
+    # Otherwise, check for specific contexts and create the requisite node
+    # of a matching context.
+    else:
+        if category_name == "Cop2":
+            container = hou.node("/img").createNode("copnet")
+
+        elif category_name == "Sop":
+            container = hou.node("/obj").createNode("geo")
+
+        elif category_name == "Dop":
+            container = hou.node("/obj").createNode("dopnet")
+
+        elif category_name == "Top":
+            container = hou.node("/obj").createNode("topnet")
+
+        # If a known context cannot be found, raise an error.
+        else:
+            raise UnsupportedCategoryError(category)
+
+        yield container
+
+        # Destroy the created container.
+        container.destroy()
