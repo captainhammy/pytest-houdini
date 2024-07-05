@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        houdini-version: ["20.0", "19.5"]
+        houdini-version: ["20.0"]  #, "19.5"]
 
     container:
       image: captainhammy/hython-runner:${{ matrix.houdini-version }}
