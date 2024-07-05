@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        houdini-version: ["20.0"]  #, "19.5"]
+        houdini-version: ["20.0", "19.5"]
 
     container:
       image: captainhammy/hython-runner:${{ matrix.houdini-version }}
@@ -19,7 +19,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Install Apprentice Licenses
+      - name: Setup licensing
         uses: captainhammy/setup-hserver-action@v1.0
         with:
           server: ${{ secrets.LICENSE_SERVER }}
