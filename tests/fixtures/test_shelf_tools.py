@@ -19,10 +19,11 @@ def test_exec_shelf_tool_script(pytester, shared_datadir):
     shelf_test_file = shared_datadir / "test_shelf_files.shelf"
 
     pytester.makepyfile(f"""
+from contextlib import nullcontext
+
 import pytest
 
 from pytest_houdini.fixtures.exceptions import MissingToolError
-from pytest_houdini.tools import does_not_raise
 
 import hou
 
@@ -30,7 +31,7 @@ import hou
     "tool_name, raiser",
     (
         ("_not_a_tool_", pytest.raises(MissingToolError)),
-        ("pytest_houdini_test_tool", does_not_raise()),
+        ("pytest_houdini_test_tool", nullcontext()),
     )
 )
 def test_exec_shelf_tool_script(exec_shelf_tool_script, tool_name, raiser):
