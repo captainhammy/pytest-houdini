@@ -60,6 +60,9 @@ def context_container(category: hou.NodeTypeCategory) -> Generator[hou.OpNode, N
     # of a matching context.
     else:
         if category_name == "Cop2":
+            container = hou.node("/img").createNode("img")
+
+        elif category_name == "Cop":
             container = hou.node("/img").createNode("copnet")
 
         elif category_name == "Sop":

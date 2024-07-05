@@ -23,7 +23,8 @@ import hou
         (hou.ropNodeTypeCategory(), nullcontext(), hou.node("/out")),
         (hou.lopNodeTypeCategory(), nullcontext(), hou.node("/stage")),
         (hou.shopNodeTypeCategory(), nullcontext(), hou.node("/shop")),
-        (hou.cop2NodeTypeCategory(), nullcontext(), hou.nodeType("CopNet/copnet")),
+        (hou.cop2NodeTypeCategory(), nullcontext(), hou.nodeType("CopNet/img")),
+        (hou.nodeTypeCategories().get("Cop"), nullcontext(), hou.nodeType("CopNet/copnet")),
         (hou.sopNodeTypeCategory(), nullcontext(), hou.nodeType("Object/geo")),
         (hou.dopNodeTypeCategory(), nullcontext(), hou.nodeType("Object/dopnet")),
         (hou.topNodeTypeCategory(), nullcontext(), hou.nodeType("Object/topnet")),
@@ -32,6 +33,9 @@ import hou
 )
 def test_context_container(category, raiser, expected):
     """Test pytest_houdini.tools.context_container()."""
+    if category is None:
+        return
+
     # Keep track if the container is expected to be deleted based on whether
     # the expected object is a node type (specific temporary container)
     expect_delete = isinstance(expected, hou.NodeType)
