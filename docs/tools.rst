@@ -2,36 +2,54 @@
 Supporting Test Tools
 =====================
 
+context_container
+-----------------
 
-
-does_not_raise
---------------
-
-The ``pytest_houdini.tools.does_not_raise`` function is a dummy context manager for testing.
-
-You can use this to help parametrize tests which may or may not raise exceptions.
-
-Consider the below test for a function which divides two values. As it does not
-validate any of the values it will result in ``ZeroDivisionError`` if *value2* is 0. We
-can use ``does_not_raise()`` in conjunction with ``pytest.raises(ZeroDivisionError)`` in order
-to test a bunch of values and handle any expected exceptions.
+The ``pytest_houdini.tools.context_container`` context manager provides an appropriate parent node (container) for which
+you can create a child node of a particular type. Pass the node type category of the type you wish to create
+and use the returned node to create a node under.
 
 .. code-block:: python
 
-    def divider(value1, value2):
-        return value1 / value2
+    with context_container(hou.sopNodeTypeCategory()) as container:
+        container.createNode("box")
 
-    @pytest.mark.parametrize(
-        "value, expected, tester",
-        [
-            (0, None, pytest.raises(ZeroDivisionError)),
-            (3.0, 0.3333333333333333, does_not_raise()),
-        ],
-    )
-    def test_divider(value, expected, tester):
+    # Attempting to access 'container' will result in a hou.ObjectWasDeleted exception.
 
-        with tester:
-            result = divider(1, value)
+A new node of the container type will always be created. Unless specified when the
+container node is created, it will be destroyed after the end of the scope.
 
-            assert result == expected
 
+.. code-block:: python
+
+    with context_container(hou.sopNodeTypeCategory(), destroy=False) as container:
+        container.createNode("box")
+
+    # 'container' is not destroyed and can still be accessed
+
+
+.. list-table:: Container node types
+    :header-rows: 1
+
+    * - Context
+      - Container Node Type
+    * - Cop
+      - CopNet/copnet
+    * - Cop2
+      - CopNet/img
+    * - Dop
+      - Object/dopnet
+    * - Driver
+      - Driver/subnet
+    * - Lop
+      - Lop/subnet
+    * - Object
+      - Object/subnet
+    * - Shop
+      - Shop/material
+    * - Sop
+      - Object/geo
+    * - Top
+      - Object/topnet
+    * - Vop
+      - Vop/subnet
