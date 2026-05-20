@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 
 
 @contextmanager
-def context_container(category: hou.NodeTypeCategory, *, destroy: bool = True) -> Generator[hou.OpNode, None, None]:
+def context_container(category: hou.NodeTypeCategory, *, destroy: bool = True) -> Generator[hou.OpNode]:
     """Context manager that provides an appropriate node to create a node under.
 
     >>> with context_container(hou.sopNodeTypeCategory()) as parent:

@@ -11,3 +11,4 @@ This `pytest <http://pytest.org>`_ plugin provides a number of fixtures and util
 
    fixtures/index.rst
    tools
+   api/modules

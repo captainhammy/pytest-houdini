@@ -5,7 +5,7 @@ from __future__ import annotations
 
 # Standard Library
 import contextlib
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING
 
 # Third Party
 import pytest
@@ -20,7 +20,7 @@ from pytest_houdini.fixtures.exceptions import (
 import hou
 
 if TYPE_CHECKING:
-    from collections.abc import Generator
+    from collections.abc import Callable, Generator
 
 
 # Non-Public Functions
@@ -84,9 +84,9 @@ def _find_matching_node(parent: hou.OpNode, request: pytest.FixtureRequest) -> h
 
 
 @pytest.fixture
-def create_temp_node() -> Generator[Callable, None, None]:
+def create_temp_node() -> Generator[Callable]:
     """Fixture to create a temporary node that will be destroyed on cleanup."""
-    _created_nodes: list[hou.Node] = []
+    created_nodes_: list[hou.Node] = []
 
     def _create(
         parent: hou.Node, node_type_name: str, node_name: str | None = None, *, run_init_scripts: bool = True
@@ -104,13 +104,13 @@ def create_temp_node() -> Generator[Callable, None, None]:
         """
         node = parent.createNode(node_type_name, node_name, run_init_scripts=run_init_scripts)
 
-        _created_nodes.append(node)
+        created_nodes_.append(node)
 
         return node
 
     yield _create
 
-    for created in _created_nodes:
+    for created in created_nodes_:
         with contextlib.suppress(hou.ObjectWasDeleted):
             created.destroy()
 

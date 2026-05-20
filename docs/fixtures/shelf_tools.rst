@@ -2,20 +2,20 @@
 Shelf Tools
 ===========
 
-There is not an easy programmatic way to execute various Houdini UI elements such as shelf tools so ``pytest-houdini``
+There is not an easy programmatic way to execute various Houdini UI elements such as shelf tools so :mod:`pytest-houdini`
 attempts to provide some tooling to help with this.
 
 exec_shelf_tool_script
 ----------------------
 
-The ``exec_shelf_tool_script`` fixture allows you to execute a shelf tool's script code section.
+The :func:`~pytest_houdini.fixtures.shelf_tools.exec_shelf_tool_script` fixture allows you to execute a shelf tool's script code section.
 
 The fixture is a **callable** which requires the name of the tool, as well as a dictionary representing the ``kwargs``
 that would be passed to the shelf tool by Houdini.
 
 In order for this fixture to work, the shelf tool must already be loaded in the Houdini session.
 
-If a tool of the name cannot be found, a ``MissingToolError`` is raised.
+If a tool of the name cannot be found, a :exc:`~pytest_houdini.fixtures.exceptions.MissingToolError` is raised.
 
 Consider the following simple tool definition where the execution sets a value in the kwargs dict:
 

@@ -4,10 +4,14 @@
 from __future__ import annotations
 
 # Standard Library
-from typing import Any, Callable
+from typing import TYPE_CHECKING, Any
 
 # Third Party
 import pytest
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
 
 # Fixtures
 
@@ -20,20 +24,22 @@ def remove_abstract_methods(monkeypatch: pytest.MonkeyPatch) -> Callable:
     we want to test. Rather than creating a subclass for testing any non-abstract methods we
     can use the fixture to remove them during the test so that the object can be instantiated.
 
-    class Foo(metaclass=abc.ABCMeta):
+    ::
 
-        @abc.abstractmethod
-        def bar(self):
-            pass
+        class Foo(metaclass=abc.ABCMeta):
 
-        def get_foo(self):
-            return "foo"
+            @abc.abstractmethod
+            def bar(self):
+                pass
 
-    def test_get_foo(remove_abstract_methods):
-        remove_abstract_methods(Foo)
+            def get_foo(self):
+                return "foo"
 
-        f = Foo()
-        assert f.get_foo() == "foo"
+        def test_get_foo(remove_abstract_methods):
+            remove_abstract_methods(Foo)
+
+            f = Foo()
+            assert f.get_foo() == "foo"
     """
 
     def _remove_abstract(cls: Any) -> None:
