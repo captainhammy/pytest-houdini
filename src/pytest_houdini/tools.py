@@ -16,6 +16,26 @@ import hou
 if TYPE_CHECKING:
     from collections.abc import Generator
 
+# Globals
+
+# Known types that can be created with their parent/node type.
+_CREATABLE_CATEGORY_MAPPINGS = {
+    "Cop2": ("/img", "img"),
+    "Cop": ("/img", "copnet"),
+    "Sop": ("/obj", "geo"),
+    "Dop": ("/obj", "dopnet"),
+    "Top": ("/obj", "topnet"),
+}
+
+# Types which can map directly to default scene nodes.
+_DIRECT_CATEGORY_MAPPINGS = {
+    "Driver": hou.node("/out"),
+    "Lop": hou.node("/stage"),
+    "Object": hou.node("/obj"),
+    "Shop": hou.node("/shop"),
+    "Vop": hou.node("/mat"),
+}
+
 
 # Functions
 
@@ -39,16 +59,7 @@ def context_container(category: hou.NodeTypeCategory, *, destroy: bool = True) -
     """
     category_name = category.name()
 
-    # Types which can map directly to default scene nodes.
-    direct_mappings = {
-        "Driver": hou.node("/out"),
-        "Lop": hou.node("/stage"),
-        "Object": hou.node("/obj"),
-        "Shop": hou.node("/shop"),
-        "Vop": hou.node("/mat"),
-    }
-
-    container = direct_mappings.get(category_name)
+    container = _DIRECT_CATEGORY_MAPPINGS.get(category_name)
 
     # If there was a direct mapping then use it.
     if container is not None:
@@ -57,25 +68,13 @@ def context_container(category: hou.NodeTypeCategory, *, destroy: bool = True) -
     # Otherwise, check for specific contexts and create the requisite node
     # of a matching context.
     else:
-        match category_name:
-            case "Cop2":
-                container = hou.node("/img").createNode("img")
+        create_data = _CREATABLE_CATEGORY_MAPPINGS.get(category_name)
 
-            case "Cop":
-                container = hou.node("/img").createNode("copnet")
+        if create_data is not None:
+            container = hou.node(create_data[0]).createNode(create_data[1])
 
-            case "Sop":
-                container = hou.node("/obj").createNode("geo")
-
-            case "Dop":
-                container = hou.node("/obj").createNode("dopnet")
-
-            case "Top":
-                container = hou.node("/obj").createNode("topnet")
-
-            # If a known context cannot be found, raise an error.
-            case _:
-                raise UnsupportedCategoryError(category)
+        else:
+            raise UnsupportedCategoryError(category)
 
     try:
         yield container
