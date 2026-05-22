@@ -30,7 +30,9 @@ jobs:
           client_secret_key: ${{ secrets.SESI_SECRET_KEY }}
 
       - name: Install dependencies
-        run: python3 -m pip install --group github
+        run: |
+          python3 -m pip install--upgrade pip
+          python3 -m pip install --group github
 
       # Run static analysis tox tests
       - name: Test with tox (static)
