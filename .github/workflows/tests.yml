@@ -31,7 +31,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python3 -m pip install--upgrade pip
+          python3 -m pip install --upgrade pip
           python3 -m pip install --group github
 
       # Run static analysis tox tests
