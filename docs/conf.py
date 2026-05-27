@@ -13,11 +13,14 @@ from sphinx_pyproject import SphinxConfig
 
 sys.path.insert(0, os.path.abspath("../src"))
 
-config = SphinxConfig("../pyproject.toml", globalns=globals())
+config = SphinxConfig(
+    "../pyproject.toml",
+    globalns=globals(),
+    config_overrides={"version":  Version.from_git(Pattern.DefaultUnprefixed).serialize()}
+)
 
 project = config.name
 copyright = f'%Y, {author}'
-version = Version.from_git(Pattern.DefaultUnprefixed).serialize()
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
