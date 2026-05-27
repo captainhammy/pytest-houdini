@@ -1,11 +1,117 @@
-[build-system]
-    requires = ["setuptools>=42", "setuptools_scm[toml]>=6.2", "wheel"]
-    build-backend = "setuptools.build_meta"
+[project]
+name = "pytest-houdini"
+dynamic = ["version"]
 
-[tool.pytest.ini_options]
-    # Disable sugar as it interferes with pytester output parsing. Allow 99% success as a test for new
-    # COPs isn't availalble in previous versions.
-    addopts = "-p no:sugar --cov --cov-report=html --cov-report=xml --cov-fail-under=99 --color=yes"
+description = "pytest plugin for testing code in Houdini"
+authors = [
+    {name = "Graham Thompson", email = "captainhammy@gmail.com"}
+]
+license = "MIT"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "pytest (>=9.0.3,<10.0.0)",
+    "pytest-datadir (>=1.8.0,<2.0.0)",
+    "pytest-mock (>=3.15.1,<4.0.0)"
+]
+
+classifiers=[
+    "Framework :: Pytest",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Topic :: Software Development :: Testing",
+]
+
+[project.entry-points."pytest11"]
+pytest-houdini = "pytest_houdini.plugin"
+
+[project.urls]
+Documentation = "https://pytest-houdini.readthedocs.io"
+Repository = "https://github.com/captainhammy/pytest-houdini"
+
+[dependency-groups]
+    docs = ["sphinx", "sphinx-rtd-theme", "sphinx-copybutton", "sphinx-pyproject", "dunamai"]
+    docstrings = ["pydocstringformatter"]
+    github = ["coverage", "tox"]
+    isort = ["isort"]
+    mypy = ["mypy"]
+    ruff = ["ruff"]
+    test = ["pytest-cov"]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0", "poetry-dynamic-versioning>=1.0.0,<2.0.0"]
+build-backend = "poetry_dynamic_versioning.backend"
+
+[tool.poetry]
+    version = "0.0.0"  # Placeholder
+
+    [tool.poetry-dynamic-versioning]
+    enable = true
+    vcs = "git"
+    pattern = "default-unprefixed"
+
+[tool.tox]
+    env_list = ["run-tests", "ruff-check", "ruff-format-check", "isort-check", "mypy", "docstring-check"]
+    labels = {test = ["run-tests"], static = ["ruff-check", "ruff-format-check", "isort-check", "mypy", "docstring-check"], fix = ["ruff-format-fix", "isort-run", "docstring-run"] }
+
+    [tool.tox.env.run-tests]
+        allowlist_externals = ["echo", "hython"]
+        dependency_groups = ["test"]
+        # Add tox packages dir as hython won't load find it by default
+        set_env = {PYTHONPATH = "{envsitepackagesdir}"}
+        commands = [["hython", "-m", "pytest", "tests/"]]
+        commands_post = [["echo", "View test coverage report at file://{toxinidir}/coverage_html_report/index.html"]]
+
+    [tool.tox.env.ruff-check]
+        skip_install = true
+        dependency_groups = ["ruff"]
+        commands = [[ "ruff", "check", "--preview", "src/", "tests/"]]
+
+    [tool.tox.env.ruff-format-check]
+        skip_install = true
+        dependency_groups = ["ruff"]
+        commands = [[ "ruff", "format", "--preview", "--check", "--diff", "src/", "tests/"]]
+
+    [tool.tox.env.ruff-format-fix]
+        skip_install = true
+        dependency_groups = ["ruff"]
+        commands = [[ "ruff", "format", "--preview", "src/", "tests/"]]
+
+    [tool.tox.env.isort-check]
+        skip_install = true
+        dependency_groups = ["isort"]
+        commands = [[ "isort", "--check", "src/", "tests/"]]
+
+    [tool.tox.env.isort-run]
+        skip_install = true
+        dependency_groups = ["isort"]
+        commands = [[ "isort", "src/", "tests/"]]
+
+    [tool.tox.env.mypy]
+#        skip_install = true
+        dependency_groups = ["mypy"]
+        commands = [[ "mypy"]]
+
+    [tool.tox.env.docstring-check]
+        dependency_groups = ["docstrings"]
+        commands = [[ "pydocstringformatter", "--exit-code", "src/"]]
+
+    [tool.tox.env.docstring-run]
+        dependency_groups = ["docstrings"]
+        commands = [[ "pydocstringformatter", "--write", "src/"]]
+
+    [tool.tox.env.docs]
+        allowlist_externals = ["echo"]
+        dependency_groups = ["docs"]
+        commands = [
+            ["sphinx-apidoc", "-o", "docs/api", "src"],
+            ["sphinx-build", "-b", "html", "-d", "{envtmpdir}/doctrees", "docs/", "{envtmpdir}/html"]
+        ]
+        commands_post = [["echo", "Docs available at file://{envtmpdir}/html/index.html"]]
+
+[tool.pytest]
+    # Disable sugar as it interferes with pytester output parsing.
+    addopts = ["-p no:sugar", "--cov", "--cov-report=html", "--cov-report=xml", "--cov-fail-under=100", "--color=yes"]
 
 [tool.coverage]
 
@@ -103,7 +209,7 @@
             "D104",  # Missing docstring in public module
             "D105",  # Missing docstring in magic method
             "D107",  # Missing docstring in __init__
-            "PT004",  # Fixtures not returning anything not starting with _
+            "I001",  # Import ordering
             "PT006",  # Allow string parameter names
         ]
 

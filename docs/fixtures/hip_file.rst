@@ -1,20 +1,25 @@
 Hip File Fixtures
 =================
 
-``pytest-houdini`` contains a number of fixtures designed to make running tests with hip files easier and to
+:mod:`pytest-houdini` contains a number of fixtures designed to make running tests with hip files easier and to
 ensure the session state is less dependent on previous tests.
 
 clear_hip_file
 --------------
 
-The ``clear_hip_file`` fixture will clear the current session before and after test running, ensuring that the scene is
+The :func:`~pytest_houdini.fixtures.hip_file.clear_hip_file` fixture will clear the current session before and after test running, ensuring that the scene is
 clean and as stateless as possible from previous tests.
 
+clear_module_hip_file
+---------------------
+
+The :func:`~pytest_houdini.fixtures.hip_file.clear_module_hip_file` fixture will clear the current hip file after running all the tests in a module, ensuring
+that the scene is clean and as stateless as possible from previous tests.
 
 load_module_test_hip_file
 -------------------------
 
-The ``load_module_test_hip_file`` fixture will load a test hip file with the same name as the running module.  It
+The :func:`~pytest_houdini.fixtures.hip_file.load_module_test_hip_file` fixture will load a test hip file with the same name as the running module.  It
 supports .hip, .hiplc, and .hipnc file types (in that order). The hip file must be under a **data/** directory which is
 a sibling of the test file. For this package, looking at the tests for the fixtures, we can see that we have a matching
 hip file for ``test_nodes.py`` (``test_nodes.hiplc``).
@@ -43,7 +48,7 @@ As this is a **module** level fixture, to use it, ensure you've added the follow
     pytestmark = pytest.mark.usefixtures("load_module_test_hip_file")
 
 
-In the event the fixture cannot find a matching file, the raised ``NoModuleTestFileError`` will contain a list of all
+In the event the fixture cannot find a matching file, the raised :exc:`~pytest_houdini.fixtures.exceptions.NoModuleTestFileError` will contain a list of all
 the paths which were tried:
 
 .. code-block:: python
@@ -54,7 +59,7 @@ the paths which were tried:
 set_test_frame
 --------------
 
-The ``set_test_frame`` fixture allows you to set the current frame to a specific value for testing and then restores it
+The :func:`~pytest_houdini.fixtures.hip_file.set_test_frame` fixture allows you to set the current frame to a specific value for testing and then restores it
 to the the frame **before** the test began once the test is completed.
 
 Consider the following example where we will say that the frame before the test is run is set to **1001**.

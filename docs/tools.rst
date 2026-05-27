@@ -5,7 +5,7 @@ Supporting Test Tools
 context_container
 -----------------
 
-The ``pytest_houdini.tools.context_container`` context manager provides an appropriate parent node (container) for which
+The :func:`pytest_houdini.tools.context_container` context manager provides an appropriate parent node (container) for which
 you can create a child node of a particular type. Pass the node type category of the type you wish to create
 and use the returned node to create a node under.
 

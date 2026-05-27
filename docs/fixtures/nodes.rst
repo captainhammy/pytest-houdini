@@ -5,7 +5,7 @@ Nodes
 create_temp_node
 ----------------
 
-The ``create_temp_node`` fixture can be used to create temporary testing nodes and not have to worry about
+The :func:`~pytest_houdini.fixtures.nodes.create_temp_node` fixture can be used to create temporary testing nodes and not have to worry about
 destroying them after the test is over. Additionally, it can be called multiple times to create many temporary nodes.
 
 It supports a limited number of parameters to affect the node creation:
@@ -41,7 +41,7 @@ In the following example we create some temp nodes to test with.
         ... # do testing
 
 After the test function is executed, the created nodes will both be destroyed.  If the test code itself
-destroys a node, the ``hou.ObjectWasDeleted`` exception will be suppressed.
+destroys a node, the :exc:`hou.ObjectWasDeleted` exception will be suppressed.
 
 
 Existing Test Node Fixtures
@@ -50,9 +50,9 @@ Existing Test Node Fixtures
 There are a number of convenience functions which can be used to automatically find test related nodes in the current
 hip file based on the test name data.
 
-The underlying tooling will inspect the ``pytest.FixtureRequest`` object and construct a number of acceptable
+The underlying tooling will inspect the :class:`pytest.FixtureRequest` object and construct a number of acceptable
 node names/paths for the specific test and try to return one of those.  If a matching node cannot be found a
-``NoTestNodeError`` is raised and the test will fail.
+:exc:`~pytest_houdini.fixtures.exceptions.NoTestNodeError` is raised and the test will fail.
 
 The node search order is as follows:
     - Node matching the exact test name
@@ -90,8 +90,8 @@ the possible nodes found (and their order of precedence) is as follows:
     - /obj/TestMyFunc
     - /obj/testmyfunc
 
-In the event that no valid nodes could be provided, the raised ``NoTestNodeError`` will contain a list of all paths which
-were tried:
+In the event that no valid nodes could be provided, the raised :exc:`~pytest_houdini.fixtures.exceptions.NoTestNodeError`
+will contain a list of all paths which were tried:
 
 .. code-block:: python
 
@@ -117,11 +117,11 @@ Object Specific Fixtures
 obj_test_geo
 ''''''''''''
 
-The ``obj_test_geo`` fixture will attempt to return the geometry of the display node of the found Object test node.
+The :func:`~pytest_houdini.fixtures.nodes.obj_test_geo` fixture will attempt to return the geometry of the display node of the found Object test node.
 
-If the found test node (using ``obj_test_node``) does not contain **SOP** nodes a ``TestNodeDoesNotContainSOPsError`` is raised.
+If the found test node (using :func:`~pytest_houdini.fixtures.nodes.obj_test_node`) does not contain **SOP** nodes a :exc:`~pytest_houdini.fixtures.exceptions.TestNodeDoesNotContainSOPsError` is raised.
 
-The returned ``hou.Geometry`` object is **read only**.
+The returned :class:`hou.Geometry` object is **read only**.
 
 .. code-block:: python
 
@@ -133,8 +133,8 @@ The returned ``hou.Geometry`` object is **read only**.
 obj_test_geo_copy
 '''''''''''''''''
 
-The ``obj_test_geo_copy`` fixture is the same as ``obj_test_geo`` however the found geometry is copied/merged into a
-new ``hou.Geometry`` instance and is not **read only**.
+The :func:`~pytest_houdini.fixtures.nodes.obj_test_geo_copy` fixture is the same as :func:`~pytest_houdini.fixtures.nodes.obj_test_geo` however the found geometry is copied/merged into a
+new :class:`hou.Geometry` instance and is not **read only**.
 
 .. code-block:: python
 

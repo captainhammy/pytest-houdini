@@ -10,33 +10,39 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        houdini-version: ["20.5", "20.0", "19.5"]
+        houdini-version: ["20.5", "21.0"]
 
     container:
       image: captainhammy/hython-runner:${{ matrix.houdini-version }}
 
     steps:
+      - name: Mark workspace as safe
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup licensing
-        uses: captainhammy/setup-hserver-action@v1.0
+        uses: captainhammy/setup-hserver-action@v1
         with:
           server: ${{ secrets.LICENSE_SERVER }}
           client_id: ${{ secrets.SESI_CLIENT_ID }}
           client_secret_key: ${{ secrets.SESI_SECRET_KEY }}
 
       - name: Install dependencies
-        run: python3 -m pip install tox tox-gh-actions
-
-      - name: Test with tox
-        run: tox
-
-      - name: Workaround for codecov/feedback#263
         run: |
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          python3 -m pip install --upgrade pip
+          python3 -m pip install --group github
+
+      # Run static analysis tox tests
+      - name: Test with tox (static)
+        run: tox -m static
+
+      # Run static analysis tox tests
+      - name: Test with tox (tests)
+        run: tox -m test
 
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

@@ -57,6 +57,37 @@ def test_clear_hip_file(request):
     assert hou.node("/obj").children() == ()
 
 
+def test_clear_module_hip_file(pytester):
+    """Test the 'clear_module_hip_file' fixture."""
+    # Create a node under /obj so there will be something there before the fixture
+    # clears the hip file on setup.
+    obj = hou.node("/obj")
+    geo = obj.createNode("geo")
+    assert hou.node("/obj").children() == (hou.node("/obj/geo1"),)
+
+    pytester.makepyfile("""
+import pytest
+
+import hou
+
+pytestmark = pytest.mark.usefixtures("clear_module_hip_file")
+
+def test_clear_module_hip_file(request):
+    assert hou.node("/obj").children() == (hou.node("/obj/geo1"),)
+
+""")
+
+    # Run the test code.
+    result = pytester.runpytest()
+
+    result.assert_outcomes(passed=1)
+
+    # Attempt to access the geo object we created earlier.  This should fail as the node
+    # was destroyed when the file was cleared.
+    with pytest.raises(hou.ObjectWasDeleted):
+        geo.path()
+
+
 @pytest.mark.parametrize("ext", [".hip", ".hiplc", ".hipnc", None])
 def test_load_module_test_hip_file(pytester, ext, shared_datadir):
     """Test the 'load_module_test_hip_file' fixture."""

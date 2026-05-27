@@ -16,12 +16,32 @@ import hou
 if TYPE_CHECKING:
     from collections.abc import Generator
 
+# Globals
+
+# Known types that can be created with their parent/node type.
+_CREATABLE_CATEGORY_MAPPINGS = {
+    "Cop2": ("/img", "img"),
+    "Cop": ("/img", "copnet"),
+    "Sop": ("/obj", "geo"),
+    "Dop": ("/obj", "dopnet"),
+    "Top": ("/obj", "topnet"),
+}
+
+# Types which can map directly to default scene nodes.
+_DIRECT_CATEGORY_MAPPINGS = {
+    "Driver": hou.node("/out"),
+    "Lop": hou.node("/stage"),
+    "Object": hou.node("/obj"),
+    "Shop": hou.node("/shop"),
+    "Vop": hou.node("/mat"),
+}
+
 
 # Functions
 
 
 @contextmanager
-def context_container(category: hou.NodeTypeCategory, *, destroy: bool = True) -> Generator[hou.OpNode, None, None]:
+def context_container(category: hou.NodeTypeCategory, *, destroy: bool = True) -> Generator[hou.OpNode]:
     """Context manager that provides an appropriate node to create a node under.
 
     >>> with context_container(hou.sopNodeTypeCategory()) as parent:
@@ -39,47 +59,27 @@ def context_container(category: hou.NodeTypeCategory, *, destroy: bool = True) -
     """
     category_name = category.name()
 
-    # Types which can map directly to default scene nodes.
-    direct_mappings = {
-        "Driver": hou.node("/out"),
-        "Lop": hou.node("/stage"),
-        "Object": hou.node("/obj"),
-        "Shop": hou.node("/shop"),
-        "Vop": hou.node("/mat"),
-    }
-
-    container = direct_mappings.get(category_name)
+    container = _DIRECT_CATEGORY_MAPPINGS.get(category_name)
 
     # If there was a direct mapping then use it.
     if container is not None:
         container = container.createNode("subnet")
 
-        yield container
-
     # Otherwise, check for specific contexts and create the requisite node
     # of a matching context.
     else:
-        if category_name == "Cop2":
-            container = hou.node("/img").createNode("img")
+        create_data = _CREATABLE_CATEGORY_MAPPINGS.get(category_name)
 
-        elif category_name == "Cop":
-            container = hou.node("/img").createNode("copnet")
+        if create_data is not None:
+            container = hou.node(create_data[0]).createNode(create_data[1])
 
-        elif category_name == "Sop":
-            container = hou.node("/obj").createNode("geo")
-
-        elif category_name == "Dop":
-            container = hou.node("/obj").createNode("dopnet")
-
-        elif category_name == "Top":
-            container = hou.node("/obj").createNode("topnet")
-
-        # If a known context cannot be found, raise an error.
         else:
             raise UnsupportedCategoryError(category)
 
+    try:
         yield container
 
-    # Destroy the created container.
-    if destroy:
-        container.destroy()
+    finally:
+        # Destroy the created container.
+        if destroy:
+            container.destroy()

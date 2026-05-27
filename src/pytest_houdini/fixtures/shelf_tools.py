@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 # Standard Library
-from typing import Callable
+from typing import TYPE_CHECKING
 
 # Third Party
 import pytest
@@ -14,6 +14,9 @@ from pytest_houdini.fixtures.exceptions import MissingToolError
 
 # Houdini
 import hou
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 # Fixtures
 
@@ -37,6 +40,6 @@ def exec_shelf_tool_script() -> Callable:
         if tool is None:
             raise MissingToolError(tool_name)
 
-        exec(tool.script(), {"kwargs": kwargs})
+        exec(tool.script(), {"kwargs": kwargs})  # noqa: S102
 
     return _exec

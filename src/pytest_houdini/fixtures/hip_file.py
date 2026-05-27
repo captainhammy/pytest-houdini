@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 # Standard Library
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING
 
 # Third Party
 import pytest
@@ -16,18 +16,20 @@ from pytest_houdini.fixtures.exceptions import NoModuleTestFileError
 import hou
 
 if TYPE_CHECKING:
-    from collections.abc import Generator
+    from collections.abc import Callable, Generator
 
 # Fixtures
 
 
 @pytest.fixture
-def clear_hip_file() -> Generator[None, None, None]:
+def clear_hip_file() -> Generator[None]:
     """Fixture to clear the current hip file before and after test running.
 
-    >>> @pytest.mark.usefixtures("clear_hip_file")
-    ... def test_something():
-    ...     # Modify the scene state
+    ::
+
+        @pytest.mark.usefixtures("clear_hip_file")
+        def test_something():
+            # Modify the scene state
     """
     hou.hipFile.clear(suppress_save_prompt=True)
 
@@ -37,9 +39,23 @@ def clear_hip_file() -> Generator[None, None, None]:
 
 
 @pytest.fixture(scope="module")
+def clear_module_hip_file() -> Generator[None]:
+    """Fixture to clear the current hip file after running all the tests in a module.
+
+    Example:
+        Place the following line at the top of the test module::
+
+            pytestmark = pytest.mark.usefixtures("clear_module_hip_file")
+    """
+    yield
+
+    hou.hipFile.clear(suppress_save_prompt=True)
+
+
+@pytest.fixture(scope="module")
 def load_module_test_hip_file(
     request: pytest.FixtureRequest,
-) -> Generator[None, None, None]:
+) -> Generator[None]:
     """Load a test hip file with the same name as the running module.
 
     Supports .hip, .hiplc, and .hipnc type files.
@@ -51,7 +67,7 @@ def load_module_test_hip_file(
     Example:
         Place the following line at the top of the test module::
 
-        pytestmark = pytest.mark.usefixtures("load_module_test_hip_file")
+            pytestmark = pytest.mark.usefixtures("load_module_test_hip_file")
     """
     test_file_path = request.path
 
@@ -81,12 +97,14 @@ def load_module_test_hip_file(
 
 
 @pytest.fixture
-def set_test_frame() -> Generator[Callable, None, None]:
+def set_test_frame() -> Generator[Callable]:
     """Fixed to set a frame for testing, restoring the previous one after completion.
 
-    >>> def test_func(set_test_frame):
-    ...    set_test_frame(1001)
-    ...    # Do test things
+    ::
+
+        def test_func(set_test_frame):
+            set_test_frame(1001)
+            # Do test things
     """
     current_frame = hou.frame()
 

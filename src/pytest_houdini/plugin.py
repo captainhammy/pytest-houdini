@@ -7,6 +7,7 @@ from importlib.util import find_spec
 if find_spec("hou"):
     from pytest_houdini.fixtures.hip_file import (
         clear_hip_file,
+        clear_module_hip_file,
         load_module_test_hip_file,
         set_test_frame,
     )
