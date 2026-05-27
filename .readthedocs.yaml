@@ -24,6 +24,13 @@ build:
          # Install docs building requirements.
          - pip install --group docs
 
+      build:
+        html:
+          - mkdir -p $READTHEDOCS_OUTPUT/html/
+          - mkdir -p $READTHEDOCS_OUTPUT/doctrees/
+          - sphinx-apidoc -o docs/api src
+          - sphinx-build -b html -d $READTHEDOCS_OUTPUT/doctrees docs/ $READTHEDOCS_OUTPUT/html
+
 # Build documentation in the "docs/" directory with Sphinx
 sphinx:
    configuration: docs/conf.py
