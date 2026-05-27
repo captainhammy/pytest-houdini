@@ -19,9 +19,8 @@ config = SphinxConfig(
     config_overrides={"version":  Version.from_git(Pattern.DefaultUnprefixed).serialize()}
 )
 
-# project = config.name
+project = config.name
 copyright = f'%Y, {author}'
-# version = Version.from_git(Pattern.DefaultUnprefixed).serialize()
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
