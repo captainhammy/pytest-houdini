@@ -22,7 +22,7 @@ if TYPE_CHECKING:
 
 
 @pytest.fixture
-def exec_shelf_tool_script() -> Callable:
+def exec_shelf_tool_script() -> Callable[[str, dict], None]:
     """Fixture to execute a shelf tool."""
 
     def _exec(tool_name: str, kwargs: dict) -> None:

@@ -14,7 +14,7 @@ from pytest_houdini.exceptions import UnsupportedCategoryError
 import hou
 
 if TYPE_CHECKING:
-    from collections.abc import Generator
+    from collections.abc import Iterator
 
 # Globals
 
@@ -27,7 +27,7 @@ _CREATABLE_CATEGORY_MAPPINGS = {
     "Top": ("/obj", "topnet"),
 }
 
-# Types which can map directly to default scene nodes.
+# Types that can map directly to default scene nodes.
 _DIRECT_CATEGORY_MAPPINGS = {
     "Driver": hou.node("/out"),
     "Lop": hou.node("/stage"),
@@ -41,11 +41,13 @@ _DIRECT_CATEGORY_MAPPINGS = {
 
 
 @contextmanager
-def context_container(category: hou.NodeTypeCategory, *, destroy: bool = True) -> Generator[hou.OpNode]:
+def context_container(category: hou.NodeTypeCategory, *, destroy: bool = True) -> Iterator[hou.OpNode]:
     """Context manager that provides an appropriate node to create a node under.
 
-    >>> with context_container(hou.sopNodeTypeCategory()) as parent:
-    ...     parent.createNode("box")
+    ::
+
+        with context_container(hou.sopNodeTypeCategory()) as parent:
+            parent.createNode("box")
 
     Args:
         category: The node type category of the node to create.
@@ -61,7 +63,7 @@ def context_container(category: hou.NodeTypeCategory, *, destroy: bool = True) -
 
     container = _DIRECT_CATEGORY_MAPPINGS.get(category_name)
 
-    # If there was a direct mapping then use it.
+    # If there was a direct mapping, then use it.
     if container is not None:
         container = container.createNode("subnet")
 

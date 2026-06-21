@@ -1,8 +1,12 @@
 """Test the pytest_houdini.fixtures.hip_file module."""
 
+# Future
+from __future__ import annotations
+
 # Standard Library
 import importlib
 import shutil
+from typing import TYPE_CHECKING
 
 # Third Party
 import pytest
@@ -13,6 +17,9 @@ import pytest_houdini.fixtures.hip_file
 # Houdini
 import hou
 
+if TYPE_CHECKING:
+    from pathlib import Path
+
 importlib.reload(pytest_houdini.fixtures.hip_file)
 
 pytest_plugins = ["pytester"]
@@ -21,7 +28,7 @@ pytest_plugins = ["pytester"]
 # Tests
 
 
-def test_clear_hip_file(pytester):
+def test_clear_hip_file(pytester: pytest.Pytester) -> None:
     """Test the 'clear_hip_file' fixture."""
     pytester.makepyfile("""
 import pytest
@@ -57,7 +64,7 @@ def test_clear_hip_file(request):
     assert hou.node("/obj").children() == ()
 
 
-def test_clear_module_hip_file(pytester):
+def test_clear_module_hip_file(pytester: pytest.Pytester) -> None:
     """Test the 'clear_module_hip_file' fixture."""
     # Create a node under /obj so there will be something there before the fixture
     # clears the hip file on setup.
@@ -89,7 +96,7 @@ def test_clear_module_hip_file(request):
 
 
 @pytest.mark.parametrize("ext", [".hip", ".hiplc", ".hipnc", None])
-def test_load_module_test_hip_file(pytester, ext, shared_datadir):
+def test_load_module_test_hip_file(pytester: pytest.Pytester, ext: str | None, shared_datadir: Path) -> None:
     """Test the 'load_module_test_hip_file' fixture."""
     data_dir = pytester.mkdir("data")
 
@@ -124,7 +131,7 @@ def test_load_module_test_hip_file():
         result.assert_outcomes(passed=1)
 
 
-def test_set_test_frame(pytester):
+def test_set_test_frame(pytester: pytest.Pytester) -> None:
     """Test the 'set_test_frame' fixture."""
     pytester.makepyfile("""
 import hou

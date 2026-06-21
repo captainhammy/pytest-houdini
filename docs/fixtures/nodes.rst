@@ -13,11 +13,12 @@ It supports a limited number of parameters to affect the node creation:
 .. code-block:: python
 
     def _create(
-        parent: hou.Node,
+        parent: hou.OpNode,
         node_type_name: str,
         node_name: str | None = None,
-        *, run_init_scripts: bool = True
-    ) -> hou.Node:
+        *,
+        run_init_scripts: bool = True
+    ) -> hou.OpNode:
         """Function to create a test node that will be destroyed on cleanup.
 
         Args:
@@ -42,6 +43,22 @@ In the following example we create some temp nodes to test with.
 
 After the test function is executed, the created nodes will both be destroyed.  If the test code itself
 destroys a node, the :exc:`hou.ObjectWasDeleted` exception will be suppressed.
+
+
+create_context_container
+------------------------
+
+The :func:`~pytest_houdini.fixtures.nodes.create_context_container` fixture is an amalgamation of the :func:`~pytest_houdini.fixtures.nodes.create_temp_node` fixture and
+the :func:`~pytest_houdini.tools.context_container` context manager; it creates a container to create nodes of a type under and deletes it after the test is run.
+
+The callable fixture takes a :class:`hou.NodeTypeCategory`.
+
+.. code-block:: python
+
+    def test_some_func(create_context_container):
+        container = create_context_container(hou.sopNodeTypeCategory())
+        node = container.createNode("box")
+        ... # do testing
 
 
 Existing Test Node Fixtures
@@ -107,8 +124,9 @@ Basic Context Fixtures
 The ``*_test_node`` fixtures will attempt to find a test node under their specific contexts (as detailed above for **obj_test_node**)
 
 The following contexts are currently provided:
-    - /obj (obj_test_node)
-    - /out (out_test_node)
+    - /obj (:obj:`~pytest_houdini.fixtures.nodes.obj_test_node`)
+    - /out (:obj:`~pytest_houdini.fixtures.nodes.out_test_node`)
+    - /stage (:obj:`~pytest_houdini.fixtures.nodes.lop_test_node`)
 
 
 Object Specific Fixtures
@@ -117,9 +135,9 @@ Object Specific Fixtures
 obj_test_geo
 ''''''''''''
 
-The :func:`~pytest_houdini.fixtures.nodes.obj_test_geo` fixture will attempt to return the geometry of the display node of the found Object test node.
+The :obj:`~pytest_houdini.fixtures.nodes.obj_test_geo` fixture will attempt to return the geometry of the display node of the found Object test node.
 
-If the found test node (using :func:`~pytest_houdini.fixtures.nodes.obj_test_node`) does not contain **SOP** nodes a :exc:`~pytest_houdini.fixtures.exceptions.TestNodeDoesNotContainSOPsError` is raised.
+If the found test node (using :obj:`~pytest_houdini.fixtures.nodes.obj_test_node`) does not contain **SOP** nodes a :exc:`~pytest_houdini.fixtures.exceptions.TestNodeDoesNotContainSOPsError` is raised.
 
 The returned :class:`hou.Geometry` object is **read only**.
 
@@ -133,7 +151,7 @@ The returned :class:`hou.Geometry` object is **read only**.
 obj_test_geo_copy
 '''''''''''''''''
 
-The :func:`~pytest_houdini.fixtures.nodes.obj_test_geo_copy` fixture is the same as :func:`~pytest_houdini.fixtures.nodes.obj_test_geo` however the found geometry is copied/merged into a
+The :obj:`~pytest_houdini.fixtures.nodes.obj_test_geo_copy` fixture is the same as :obj:`~pytest_houdini.fixtures.nodes.obj_test_geo` however the found geometry is copied/merged into a
 new :class:`hou.Geometry` instance and is not **read only**.
 
 .. code-block:: python

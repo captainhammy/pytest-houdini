@@ -34,9 +34,9 @@ Repository = "https://github.com/captainhammy/pytest-houdini"
     docstrings = ["pydocstringformatter"]
     github = ["coverage", "tox"]
     isort = ["isort"]
-    mypy = ["mypy"]
     ruff = ["ruff"]
     test = ["pytest-cov"]
+    ty = ["ty"]
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0", "poetry-dynamic-versioning>=1.0.0,<2.0.0"]
@@ -51,8 +51,8 @@ build-backend = "poetry_dynamic_versioning.backend"
     pattern = "default-unprefixed"
 
 [tool.tox]
-    env_list = ["run-tests", "ruff-check", "ruff-format-check", "isort-check", "mypy", "docstring-check"]
-    labels = {test = ["run-tests"], static = ["ruff-check", "ruff-format-check", "isort-check", "mypy", "docstring-check"], fix = ["ruff-format-fix", "isort-run", "docstring-run"] }
+    env_list = ["run-tests", "ruff-check", "ruff-format-check", "isort-check", "ty", "docstring-check"]
+    labels = {test = ["run-tests"], static = ["ruff-check", "ruff-format-check", "isort-check", "ty", "docstring-check"], fix = ["ruff-format-fix", "isort-run", "docstring-run"] }
 
     [tool.tox.env.run-tests]
         allowlist_externals = ["echo", "hython"]
@@ -87,16 +87,17 @@ build-backend = "poetry_dynamic_versioning.backend"
         dependency_groups = ["isort"]
         commands = [[ "isort", "src/", "tests/"]]
 
-    [tool.tox.env.mypy]
-#        skip_install = true
-        dependency_groups = ["mypy"]
-        commands = [[ "mypy"]]
+    [tool.tox.env.ty]
+        dependency_groups = ["ty", "test"]
+        commands = [[ "ty", "check", "src/", "tests/"]]
 
     [tool.tox.env.docstring-check]
+        skip_install = true
         dependency_groups = ["docstrings"]
         commands = [[ "pydocstringformatter", "--exit-code", "src/"]]
 
     [tool.tox.env.docstring-run]
+        skip_install = true
         dependency_groups = ["docstrings"]
         commands = [[ "pydocstringformatter", "--write", "src/"]]
 
@@ -114,7 +115,6 @@ build-backend = "poetry_dynamic_versioning.backend"
     addopts = ["-p no:sugar", "--cov", "--cov-report=html", "--cov-report=xml", "--cov-fail-under=100", "--color=yes"]
 
 [tool.coverage]
-
     [tool.coverage.run]
         branch = true
         source =  [
@@ -127,6 +127,7 @@ build-backend = "poetry_dynamic_versioning.backend"
         disable_warnings = [
             "module-not-measured",
         ]
+
     [tool.coverage.report]
         exclude_lines = [
             # Have to re-enable the standard pragma
@@ -164,15 +165,12 @@ build-backend = "poetry_dynamic_versioning.backend"
     dedup_headings = true
     indented_import_headings = false
 
-[tool.mypy]
-    files = "src/pytest_houdini"
-    disallow_incomplete_defs = true
-    disallow_untyped_calls = true
-    disallow_untyped_defs = true
+[tool.ty]
+    [tool.ty.analysis]
+        allowed-unresolved-imports = ["hou"]
 
-    [[tool.mypy.overrides]]
-        module = "hou.*"
-        ignore_missing_imports = true
+    [tool.ty.environment]
+        root = ["./src/"]
 
 [tool.ruff]
     line-length = 120
@@ -195,20 +193,23 @@ build-backend = "poetry_dynamic_versioning.backend"
             "LOG",  #  flake8-logging
             "BLE",  # flake8-blind-except
             "A",  # flake8-builtins
+            "ANN",  # flake8-annotations
             "C4",  # flake8-comprehensions
             "RET",  # flake8-return
             "SIM",  # flake8-simplify
+            "PYI",  # flake8-pyi
+            "Q", # flake8-quotes
             "TCH",  # flake8-type-checking
             "PTH",  # flake8-use-pathlib
             "RUF",  # Ruff specific
             "FBT",  # flake8-boolean-trap
             "FURB",  # refurb
-            "PYI",  # flake8-pyi
         ]
         ignore = [
             "D104",  # Missing docstring in public module
             "D105",  # Missing docstring in magic method
             "D107",  # Missing docstring in __init__
+            "FBT001",  # Boolean type hint
             "I001",  # Import ordering
             "PT006",  # Allow string parameter names
         ]

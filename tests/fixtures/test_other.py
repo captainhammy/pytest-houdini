@@ -1,10 +1,17 @@
 """Test the pytest_houdini.fixtures.other module."""
 
+# Future
+from __future__ import annotations
+
 # Standard Library
 import importlib
+from typing import TYPE_CHECKING
 
 # pytest-houdini
 import pytest_houdini.fixtures.other
+
+if TYPE_CHECKING:
+    import pytest
 
 importlib.reload(pytest_houdini.fixtures.other)
 
@@ -14,7 +21,7 @@ pytest_plugins = ["pytester"]
 # Tests
 
 
-def test_remove_abstract_methods(pytester, shared_datadir):
+def test_remove_abstract_methods(pytester: pytest.Pytester) -> None:
     """Test the 'remove_abstract_methods' fixture."""
     pytester.makepyfile("""
 import abc

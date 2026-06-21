@@ -1,13 +1,22 @@
 """Test the pytest_houdini.fixtures.nodes module."""
 
+# Future
+from __future__ import annotations
+
 # Standard Library
 import importlib
+from typing import TYPE_CHECKING
 
 # pytest-houdini
 import pytest_houdini.fixtures.nodes
 
 # Houdini
 import hou
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    import pytest
 
 importlib.reload(pytest_houdini.fixtures.nodes)
 
@@ -17,7 +26,7 @@ pytest_plugins = ["pytester"]
 # Tests
 
 
-def test_create_temp_node(pytester):
+def test_create_temp_node(pytester: pytest.Pytester) -> None:
     """Test the 'create_temp_node' fixture."""
     pytester.makepyfile("""
 import hou
@@ -59,7 +68,7 @@ def test_create_temp_node_multiple(create_temp_node):
     assert hou.node("/obj").children() == (result1, result2)
 
 
-# Sentinel test to ensure that the test code is run inprocess and that things
+# Sentinel test to ensure that the test code is run in-process and that things
 # are being properly cleaned up.
 def test_sentinel():
     hou.node("/obj").createNode("geo", "SENTINEL")
@@ -72,7 +81,49 @@ def test_sentinel():
     assert hou.node("/obj").children() == (hou.node("/obj/SENTINEL"),)
 
 
-def test_parametrized_node_names(pytester, shared_datadir):
+def test_create_context_container(pytester: pytest.Pytester) -> None:
+    """Test the 'create_context_node' fixture."""
+    pytester.makepyfile("""
+import hou
+
+# Test the basic fixture behavior.
+def test_create_context_container(create_context_container):
+    container1 = create_context_container(hou.sopNodeTypeCategory())
+    container2 = create_context_container(hou.ropNodeTypeCategory())
+
+    assert container1 in hou.node("/obj").children()
+    assert container2 in hou.node("/out").children()
+    container2.destroy()
+""")
+    result = pytester.runpytest()
+
+    result.assert_outcomes(passed=1)
+
+    assert hou.node("/obj").children() == (hou.node("/obj/SENTINEL"),)
+
+
+def test_lop_test_node(pytester: pytest.Pytester, shared_datadir: Path) -> None:
+    """Test the 'lop_test_node' fixture."""
+    test_hip = shared_datadir / "test_nodes.hiplc"
+
+    pytester.makepyfile(f"""
+import hou
+
+hou.hipFile.load("{test_hip.as_posix()}", ignore_load_warnings=True)
+
+def test_lop_test_node(lop_test_node):
+    target_node = hou.node("/stage/test_lop_test_node")
+
+    assert target_node is not None
+    assert target_node == lop_test_node
+
+""")
+    result = pytester.runpytest()
+
+    result.assert_outcomes(passed=1)
+
+
+def test_parametrized_node_names(pytester: pytest.Pytester, shared_datadir: Path) -> None:
     """Test to ensure node names are correct when using fixtures along with parametrized tests.
 
     The test nodes will be found according to the original name,
@@ -96,11 +147,10 @@ def test_obj_test_node_func(obj_test_node, extra_parm, request):
 
 """)
     result = pytester.runpytest()
-
     result.assert_outcomes(passed=2)
 
 
-def test_obj_test_node(pytester, shared_datadir):
+def test_obj_test_node(pytester: pytest.Pytester, shared_datadir: Path) -> None:
     """Test the 'obj_test_node' fixture."""
     test_hip = shared_datadir / "test_nodes.hiplc"
 
@@ -156,11 +206,10 @@ def test_no_matching(obj_test_node):
 
 """)
     result = pytester.runpytest()
-
     result.assert_outcomes(passed=7, errors=1)
 
 
-def test_obj_test_geo(pytester, shared_datadir):
+def test_obj_test_geo(pytester: pytest.Pytester, shared_datadir: Path) -> None:
     """Test the 'obj_test_geo' fixture."""
     test_hip = shared_datadir / "test_nodes.hiplc"
 
@@ -187,7 +236,7 @@ def test_obj_test_geo(obj_test_geo):
     result.assert_outcomes(passed=1, errors=2)
 
 
-def test_obj_test_geo_copy(pytester, shared_datadir):
+def test_obj_test_geo_copy(pytester: pytest.Pytester, shared_datadir: Path) -> None:
     """Test the 'obj_test_geo_copy' fixture."""
     test_hip = shared_datadir / "test_nodes.hiplc"
 
@@ -209,7 +258,7 @@ def test_obj_test_geo_copy(obj_test_geo_copy):
     result.assert_outcomes(passed=1)
 
 
-def test_out_test_node(pytester, shared_datadir):
+def test_out_test_node(pytester: pytest.Pytester, shared_datadir: Path) -> None:
     """Test the 'out_test_node' fixture."""
     test_hip = shared_datadir / "test_nodes.hiplc"
 

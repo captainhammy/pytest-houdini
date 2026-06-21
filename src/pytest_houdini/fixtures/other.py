@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 # Standard Library
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 # Third Party
 import pytest
@@ -17,11 +17,11 @@ if TYPE_CHECKING:
 
 
 @pytest.fixture
-def remove_abstract_methods(monkeypatch: pytest.MonkeyPatch) -> Callable:
+def remove_abstract_methods(monkeypatch: pytest.MonkeyPatch) -> Callable[[type[object]], None]:
     """Fixture to temporarily remove abstract methods from a class for testing purposes.
 
     Consider the following class definition with an abstract method and a concrete method which
-    we want to test. Rather than creating a subclass for testing any non-abstract methods we
+    we want to test. Rather than creating a subclass for testing any non-abstract methods, we
     can use the fixture to remove them during the test so that the object can be instantiated.
 
     ::
@@ -42,7 +42,7 @@ def remove_abstract_methods(monkeypatch: pytest.MonkeyPatch) -> Callable:
             assert f.get_foo() == "foo"
     """
 
-    def _remove_abstract(cls: Any) -> None:
+    def _remove_abstract(cls: type[object]) -> None:
         monkeypatch.setattr(cls, "__abstractmethods__", set())
 
     return _remove_abstract

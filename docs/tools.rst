@@ -7,7 +7,7 @@ context_container
 
 The :func:`pytest_houdini.tools.context_container` context manager provides an appropriate parent node (container) for which
 you can create a child node of a particular type. Pass the node type category of the type you wish to create
-and use the returned node to create a node under.
+and use the returned node to create you node(s) under.
 
 .. code-block:: python
 
@@ -25,7 +25,7 @@ container node is created, it will be destroyed after the end of the scope.
     with context_container(hou.sopNodeTypeCategory(), destroy=False) as container:
         container.createNode("box")
 
-    # 'container' is not destroyed and can still be accessed
+    # 'container' is not destroyed and can still be accessed.
 
 
 .. list-table:: Container node types
