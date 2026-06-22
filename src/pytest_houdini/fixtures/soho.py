@@ -1,16 +1,18 @@
-"""Fixtures to support mocking Mantra/SOHO related functionality."""
+"""Fixtures to support mocking Mantra/SOHO-related functionality."""
 
 # Future
 from __future__ import annotations
 
 # Standard Library
 import sys
-from typing import TYPE_CHECKING, Any, NamedTuple
+from typing import TYPE_CHECKING, NamedTuple
 
 # Third Party
 import pytest
 
 if TYPE_CHECKING:
+    from unittest.mock import MagicMock
+
     from pytest_mock import MockerFixture
 
 # Fixtures
@@ -30,9 +32,11 @@ def patch_soho(monkeypatch: pytest.MonkeyPatch, mocker: MockerFixture) -> NamedT
         - mantra
         - soho
 
-    >>> def test_soho_thing(patch_soho):
-    ...     patch_soho.mantra.property.return_value = 3
-    ...     # Test code
+    ::
+
+        def test_soho_thing(patch_soho):
+            patch_soho.mantra.property.return_value = 3
+            # Test code
     """
     mock_api = mocker.MagicMock()
     mock_frame = mocker.MagicMock()
@@ -49,11 +53,11 @@ def patch_soho(monkeypatch: pytest.MonkeyPatch, mocker: MockerFixture) -> NamedT
     monkeypatch.setitem(sys.modules, "soho", mock_soho)
 
     class MockSoho(NamedTuple):
-        IFDapi: Any
-        IFDframe: Any
-        IFDhooks: Any
-        IFDsettings: Any
-        mantra: Any
-        soho: Any
+        IFDapi: MagicMock
+        IFDframe: MagicMock
+        IFDhooks: MagicMock
+        IFDsettings: MagicMock
+        mantra: MagicMock
+        soho: MagicMock
 
     return MockSoho(mock_api, mock_frame, mock_hooks, mock_settings, mock_mantra, mock_soho)

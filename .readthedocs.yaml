@@ -12,10 +12,10 @@ build:
     python: "3.13"
   jobs:
       install:
-         # Since the install step is overridden, pip is no longer updated automatically.
+         # Since the installation step is overridden, pip is no longer updated automatically.
          - pip install --upgrade pip
          # Install pip-tools so we can use it to install the primary dependencies from
-         # pyproject.toml via generating a requirements file and installing that.
+         # pyproject.toml via generating a requirements.txt file and installing that.
          - pip install pip-tools
          - pip-compile -o requirements.txt pyproject.toml
          - pip install -r requirements.txt

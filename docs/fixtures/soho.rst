@@ -5,7 +5,7 @@ Mantra / SOHO
 patch_soho
 ----------
 
-The :func:`~pytest_houdini.fixtures.soho.patch_soho` fixture is a catch-all fixture for mocking various Mantra and SOHO modules.  It currently covers the
+The :obj:`~pytest_houdini.fixtures.soho.patch_soho` fixture is a catch-all fixture for mocking various Mantra and SOHO modules.  It currently covers the
 following modules via a singular named tuple with correspondingly named mock objects:
 
     - IFDapi
@@ -15,7 +15,7 @@ following modules via a singular named tuple with correspondingly named mock obj
     - mantra
     - soho
 
-For example, to test code that is run by Mantra, we could use this to mock a :func:`mantra.property()` call:
+For example, to test code that is run by Mantra, we could use this to mock a :func:`mantra.property` call:
 
 .. code-block:: python
 

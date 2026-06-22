@@ -5,7 +5,7 @@ from __future__ import annotations
 
 # Standard Library
 import contextlib
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Protocol, cast
 
 # Third Party
 import pytest
@@ -14,16 +14,78 @@ import pytest
 from pytest_houdini.fixtures.exceptions import (
     NoTestNodeError,
     TestNodeDoesNotContainSOPsError,
+    UnsupportedCategoryError,
 )
 
 # Houdini
 import hou
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Generator
+    from collections.abc import Callable, Iterator
+
+
+# Globals
+
+# Known types that can be created with their parent/node type.
+_CREATABLE_CATEGORY_MAPPINGS = {
+    "Cop2": ("/img", "img"),
+    "Cop": ("/img", "copnet"),
+    "Sop": ("/obj", "geo"),
+    "Dop": ("/obj", "dopnet"),
+    "Top": ("/obj", "topnet"),
+}
+
+# Types that can map directly to default scene nodes.
+_DIRECT_CATEGORY_MAPPINGS = {
+    "Driver": hou.node("/out"),
+    "Lop": hou.node("/stage"),
+    "Object": hou.node("/obj"),
+    "Shop": hou.node("/shop"),
+    "Vop": hou.node("/mat"),
+}
+
+# Classes
+
+
+class CallableToCreateTempNode(Protocol):
+    """Protocol for a callable object that creates a temporary node."""
+
+    def __call__(  # noqa: D102 # pragma: no cover
+        self, parent: hou.OpNode, node_type_name: str, node_name: str | None = None, *, run_init_scripts: bool = True
+    ) -> hou.OpNode: ...
 
 
 # Non-Public Functions
+
+
+def _context_container(category: hou.NodeTypeCategory) -> hou.OpNode:
+    """Create an appropriate node to create a node of the provided category under.
+
+    Args:
+        category: The node type category of the node to create.
+
+    Returns:
+        An appropriate parent node to create a node of the desired type under.
+
+    Raises:
+        ValueError: Raised if the category does not correspond to a known type.
+    """
+    category_name = category.name()
+
+    container = _DIRECT_CATEGORY_MAPPINGS.get(category_name)
+
+    # If there was a direct mapping, then use it.
+    if container is not None:
+        return container.createNode("subnet")
+
+    # Otherwise, check for specific contexts and create the requisite node
+    # of a matching context.
+    create_data = _CREATABLE_CATEGORY_MAPPINGS.get(category_name)
+
+    if create_data is not None:
+        return hou.node(create_data[0]).createNode(create_data[1])
+
+    raise UnsupportedCategoryError(category)
 
 
 def _find_matching_node(parent: hou.OpNode, request: pytest.FixtureRequest) -> hou.OpNode:
@@ -31,7 +93,7 @@ def _find_matching_node(parent: hou.OpNode, request: pytest.FixtureRequest) -> h
 
     Node search order is as follows:
     - Node matching the exact test name
-    - Node matching the class name + test name (minus 'test_' prefix for function name)
+    - Node matching the class name and test name (minus 'test_' prefix for function name)
     - Node matching the class name / test name (minus 'test_' prefix for function name)
     - Node matching the class name
 
@@ -49,7 +111,7 @@ def _find_matching_node(parent: hou.OpNode, request: pytest.FixtureRequest) -> h
     """
     test_name = request.node.originalname
 
-    # First try to find a node with the exact test name.
+    # First, try to find a node with the exact test name.
     names = [test_name]
 
     if request.cls is not None:
@@ -64,7 +126,7 @@ def _find_matching_node(parent: hou.OpNode, request: pytest.FixtureRequest) -> h
             # Also support the test node being under a parent node based on the class name.
             f"{cls_name}/{test_name}",
             f"{cls_name.lower()}/{test_name}",
-            # Finally try to find a node with the class name.
+            # Finally, try to find a node with the class name.
             cls_name,
             cls_name.lower(),
         ])
@@ -84,13 +146,13 @@ def _find_matching_node(parent: hou.OpNode, request: pytest.FixtureRequest) -> h
 
 
 @pytest.fixture
-def create_temp_node() -> Generator[Callable]:
+def create_temp_node() -> Iterator[CallableToCreateTempNode]:
     """Fixture to create a temporary node that will be destroyed on cleanup."""
-    created_nodes_: list[hou.Node] = []
+    created_nodes_: list[hou.OpNode] = []
 
     def _create(
-        parent: hou.Node, node_type_name: str, node_name: str | None = None, *, run_init_scripts: bool = True
-    ) -> hou.Node:
+        parent: hou.OpNode, node_type_name: str, node_name: str | None = None, *, run_init_scripts: bool = True
+    ) -> hou.OpNode:
         """Function to create a test node that will be destroyed on cleanup.
 
         Args:
@@ -116,15 +178,49 @@ def create_temp_node() -> Generator[Callable]:
 
 
 @pytest.fixture
-def obj_test_node(request: pytest.FixtureRequest) -> hou.OpNode:
-    """Fixture to provide a node in /obj matching the test."""
-    parent = hou.node("/obj")
+def create_context_container() -> Iterator[Callable[[hou.NodeTypeCategory], hou.OpNode]]:
+    """Fixture to create an appropriate node to create a node under."""
+    created_nodes_: list[hou.OpNode] = []
 
-    return _find_matching_node(parent, request)
+    def _create(category: hou.NodeTypeCategory) -> hou.OpNode:
+        """Create a node suitable to create nodes of the supplied type category under.
+
+        Args:
+            category: The node type category of the node to create.
+
+        Returns:
+            An appropriate parent node to create a node of the desired type under.
+        """
+        container = _context_container(category)
+        created_nodes_.append(container)
+
+        return container
+
+    yield _create
+
+    for created in created_nodes_:
+        with contextlib.suppress(hou.ObjectWasDeleted):
+            created.destroy()
 
 
 @pytest.fixture
-def obj_test_geo(obj_test_node: hou.OpNode) -> hou.Geometry:
+def lop_test_node(request: pytest.FixtureRequest) -> hou.LopNode:
+    """Fixture to provide a node in /stage matching the test."""
+    parent = hou.node("/stage")
+
+    return cast("hou.LopNode", _find_matching_node(parent, request))
+
+
+@pytest.fixture
+def obj_test_node(request: pytest.FixtureRequest) -> hou.ObjNode:
+    """Fixture to provide a node in /obj matching the test."""
+    parent = hou.node("/obj")
+
+    return cast("hou.ObjNode", _find_matching_node(parent, request))
+
+
+@pytest.fixture
+def obj_test_geo(obj_test_node: hou.ObjNode) -> hou.Geometry:
     """Fixture to provide the read-only display node geometry of a node in /obj matching the test."""
     if obj_test_node.childTypeCategory() != hou.sopNodeTypeCategory():
         raise TestNodeDoesNotContainSOPsError(obj_test_node)
@@ -143,8 +239,8 @@ def obj_test_geo_copy(obj_test_geo: hou.Geometry) -> hou.Geometry:
 
 
 @pytest.fixture
-def out_test_node(request: pytest.FixtureRequest) -> hou.OpNode:
+def out_test_node(request: pytest.FixtureRequest) -> hou.RopNode:
     """Fixture to provide a node in /out matching the test."""
     parent = hou.node("/out")
 
-    return _find_matching_node(parent, request)
+    return cast("hou.RopNode", _find_matching_node(parent, request))

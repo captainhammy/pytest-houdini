@@ -38,7 +38,7 @@ jobs:
       - name: Test with tox (static)
         run: tox -m static
 
-      # Run static analysis tox tests
+      # Run unit tests with tox
       - name: Test with tox (tests)
         run: tox -m test
 

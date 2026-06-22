@@ -58,3 +58,14 @@ class TestNodeDoesNotContainSOPsError(Exception):
 
     def __init__(self, node: hou.OpNode) -> None:
         super().__init__(f"{node.path()} does not contain SOP nodes.")
+
+
+class UnsupportedCategoryError(ValueError):
+    """Exception raised when an invalid node type category is passed.
+
+    Args:
+        category: The invalid node type category.
+    """
+
+    def __init__(self, category: hou.NodeTypeCategory) -> None:
+        super().__init__(f"Unknown category type {category.name()}")

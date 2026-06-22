@@ -7,19 +7,34 @@ ensure the session state is less dependent on previous tests.
 clear_hip_file
 --------------
 
-The :func:`~pytest_houdini.fixtures.hip_file.clear_hip_file` fixture will clear the current session before and after test running, ensuring that the scene is
+The :obj:`~pytest_houdini.fixtures.hip_file.clear_hip_file` fixture will clear the current session before and after test running, ensuring that the scene is
 clean and as stateless as possible from previous tests.
+
+.. code-block:: python
+
+    @pytest.mark.usefixtures("clear_hip_file")
+    def test_something():
+        # Modify the scene state
+
 
 clear_module_hip_file
 ---------------------
 
-The :func:`~pytest_houdini.fixtures.hip_file.clear_module_hip_file` fixture will clear the current hip file after running all the tests in a module, ensuring
+The :obj:`~pytest_houdini.fixtures.hip_file.clear_module_hip_file` fixture will clear the current hip file after running all the tests in a module, ensuring
 that the scene is clean and as stateless as possible from previous tests.
+
+As this is a **module** level fixture, to use it, ensure you've added the following at the top of the test file:
+
+.. code-block:: python
+
+
+    pytestmark = pytest.mark.usefixtures("clear_module_hip_file")
+
 
 load_module_test_hip_file
 -------------------------
 
-The :func:`~pytest_houdini.fixtures.hip_file.load_module_test_hip_file` fixture will load a test hip file with the same name as the running module.  It
+The :obj:`~pytest_houdini.fixtures.hip_file.load_module_test_hip_file` fixture will load a test hip file with the same name as the running module.  It
 supports .hip, .hiplc, and .hipnc file types (in that order). The hip file must be under a **data/** directory which is
 a sibling of the test file. For this package, looking at the tests for the fixtures, we can see that we have a matching
 hip file for ``test_nodes.py`` (``test_nodes.hiplc``).
@@ -67,8 +82,7 @@ Consider the following example where we will say that the frame before the test 
 .. code-block:: python
 
     def test_func(set_test_frame):
-        hou.setFrame(1002)
-        assert hou.frame() == 1002
+        assert hou.frame() == 1001
         set_test_frame(1003)
         assert hou.frame() == 1003
         # Do other tests which rely on the frame being set to the 1003.

@@ -1,4 +1,4 @@
-"""Fixtures to support mocking Houdini UI related functionality."""
+"""Fixtures to support mocking Houdini UI-related functionality."""
 
 # Future
 from __future__ import annotations
@@ -14,6 +14,8 @@ import pytest
 import hou
 
 if TYPE_CHECKING:
+    from unittest.mock import MagicMock
+
     from pytest_mock import MockerFixture
 
 
@@ -21,8 +23,8 @@ if TYPE_CHECKING:
 
 
 @pytest.fixture
-def mock_hdefereval(monkeypatch: pytest.MonkeyPatch, mocker: MockerFixture) -> MockerFixture:
-    """Mock hdefereval which isn't available when running tests via Hython."""
+def mock_hdefereval(monkeypatch: pytest.MonkeyPatch, mocker: MockerFixture) -> MagicMock:
+    """Mock hdefereval as it isn't available when running tests via Hython."""
     mocked_hdefereval = mocker.MagicMock()
 
     monkeypatch.setitem(sys.modules, "hdefereval", mocked_hdefereval)
@@ -31,7 +33,7 @@ def mock_hdefereval(monkeypatch: pytest.MonkeyPatch, mocker: MockerFixture) -> M
 
 
 @pytest.fixture
-def mock_hou_qt(monkeypatch: pytest.MonkeyPatch, mocker: MockerFixture) -> MockerFixture:
+def mock_hou_qt(monkeypatch: pytest.MonkeyPatch, mocker: MockerFixture) -> MagicMock:
     """Mock the hou.qt module which isn't available when running tests via Hython."""
     mock_qt = mocker.MagicMock()
 
@@ -41,7 +43,7 @@ def mock_hou_qt(monkeypatch: pytest.MonkeyPatch, mocker: MockerFixture) -> Mocke
 
 
 @pytest.fixture
-def mock_hou_ui(monkeypatch: pytest.MonkeyPatch, mocker: MockerFixture) -> MockerFixture:
+def mock_hou_ui(monkeypatch: pytest.MonkeyPatch, mocker: MockerFixture) -> MagicMock:
     """Mock the hou.ui module which isn't available when running tests via Hython."""
     mock_ui = mocker.MagicMock()
 

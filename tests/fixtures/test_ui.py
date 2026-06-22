@@ -3,6 +3,9 @@
 # Standard Library
 import importlib
 
+# Third Party
+import pytest
+
 # pytest-houdini
 import pytest_houdini.fixtures.ui
 
@@ -14,7 +17,7 @@ pytest_plugins = ["pytester"]
 # Tests
 
 
-def test_mock_hdefereval(pytester):
+def test_mock_hdefereval(pytester: pytest.Pytester) -> None:
     """Test the 'mock_hdefereval' fixture."""
     pytester.makepyfile("""
 import hou
@@ -30,7 +33,7 @@ def test_mock_hdefereval(mock_hdefereval):
     result.assert_outcomes(passed=1)
 
 
-def test_mock_hou_qt(pytester):
+def test_mock_hou_qt(pytester: pytest.Pytester) -> None:
     """Test the 'mock_hou_qt' fixture."""
     pytester.makepyfile("""
 import hou
@@ -54,7 +57,7 @@ def test_no_post_qt():
     result.assert_outcomes(passed=3)
 
 
-def test_mock_hou_ui(pytester):
+def test_mock_hou_ui(pytester: pytest.Pytester) -> None:
     """Test the 'mock_hou_ui' fixture."""
     pytester.makepyfile("""
 import hou
@@ -78,7 +81,7 @@ def test_no_post_ui():
     result.assert_outcomes(passed=3)
 
 
-def test_set_ui_available(pytester):
+def test_set_ui_available(pytester: pytest.Pytester) -> None:
     """Test the 'set_ui_available' fixture."""
     pytester.makepyfile("""
 import pytest

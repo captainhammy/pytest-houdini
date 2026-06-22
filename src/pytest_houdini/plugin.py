@@ -3,7 +3,7 @@
 # Standard Library
 from importlib.util import find_spec
 
-# If Houdini is running then we can import our fixtures to expose.
+# If Houdini is running, then we can import our fixtures to expose.
 if find_spec("hou"):
     from pytest_houdini.fixtures.hip_file import (
         clear_hip_file,
@@ -12,7 +12,9 @@ if find_spec("hou"):
         set_test_frame,
     )
     from pytest_houdini.fixtures.nodes import (
+        create_context_container,
         create_temp_node,
+        lop_test_node,
         obj_test_geo,
         obj_test_geo_copy,
         obj_test_node,

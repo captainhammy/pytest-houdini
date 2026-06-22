@@ -16,13 +16,13 @@ from pytest_houdini.fixtures.exceptions import NoModuleTestFileError
 import hou
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Generator
+    from collections.abc import Callable, Iterator
 
 # Fixtures
 
 
 @pytest.fixture
-def clear_hip_file() -> Generator[None]:
+def clear_hip_file() -> Iterator[None]:
     """Fixture to clear the current hip file before and after test running.
 
     ::
@@ -39,13 +39,14 @@ def clear_hip_file() -> Generator[None]:
 
 
 @pytest.fixture(scope="module")
-def clear_module_hip_file() -> Generator[None]:
+def clear_module_hip_file() -> Iterator[None]:
     """Fixture to clear the current hip file after running all the tests in a module.
 
-    Example:
-        Place the following line at the top of the test module::
+    Place the following line at the top of the test module:
 
-            pytestmark = pytest.mark.usefixtures("clear_module_hip_file")
+    ::
+
+        pytestmark = pytest.mark.usefixtures("clear_module_hip_file")
     """
     yield
 
@@ -55,19 +56,20 @@ def clear_module_hip_file() -> Generator[None]:
 @pytest.fixture(scope="module")
 def load_module_test_hip_file(
     request: pytest.FixtureRequest,
-) -> Generator[None]:
+) -> Iterator[None]:
     """Load a test hip file with the same name as the running module.
 
     Supports .hip, .hiplc, and .hipnc type files.
 
-    The file must be under a data/ directory which is a sibling of the test file.
+    The file must be under a `data/` directory, which is a sibling of the test file.
 
     The fixture will clear the hip file after the tests are completed.
 
-    Example:
-        Place the following line at the top of the test module::
+    Place the following line at the top of the test module:
 
-            pytestmark = pytest.mark.usefixtures("load_module_test_hip_file")
+    ::
+
+        pytestmark = pytest.mark.usefixtures("load_module_test_hip_file")
     """
     test_file_path = request.path
 
@@ -97,8 +99,8 @@ def load_module_test_hip_file(
 
 
 @pytest.fixture
-def set_test_frame() -> Generator[Callable]:
-    """Fixed to set a frame for testing, restoring the previous one after completion.
+def set_test_frame() -> Iterator[Callable[[float], None]]:
+    """Fixture to set the frame for testing, restoring the previous one after completion.
 
     ::
 

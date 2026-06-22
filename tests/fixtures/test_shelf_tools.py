@@ -1,10 +1,19 @@
 """Test the pytest_houdini.fixtures.shelf_tools module."""
 
+# Future
+from __future__ import annotations
+
 # Standard Library
 import importlib
+from typing import TYPE_CHECKING
 
 # pytest-houdini
 import pytest_houdini.fixtures.shelf_tools
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    import pytest
 
 importlib.reload(pytest_houdini.fixtures.shelf_tools)
 
@@ -14,7 +23,7 @@ pytest_plugins = ["pytester"]
 # Tests
 
 
-def test_exec_shelf_tool_script(pytester, shared_datadir):
+def test_exec_shelf_tool_script(pytester: pytest.Pytester, shared_datadir: Path) -> None:
     """Test the 'exec_shelf_tool_script' fixture."""
     shelf_test_file = shared_datadir / "test_shelf_files.shelf"
 

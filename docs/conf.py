@@ -1,17 +1,15 @@
-# Configuration file for the Sphinx documentation builder.
-#
-# For the full list of built-in configuration values, see the documentation:
-# https://www.sphinx-doc.org/en/master/usage/configuration.html
+"""Configure documentation for Sphinx."""
 
-# -- Project information -----------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
-import os
+# Standard Library
+import pathlib
 import sys
 
+# Third Party
 from dunamai import Pattern, Version
 from sphinx_pyproject import SphinxConfig
 
-sys.path.insert(0, os.path.abspath("../src"))
+# Add package source path to the sys.path for autodoc purposes.
+sys.path.insert(0, pathlib.Path("../src").resolve().as_posix())
 
 config = SphinxConfig(
     "../pyproject.toml",
@@ -20,7 +18,7 @@ config = SphinxConfig(
 )
 
 project = config.name
-copyright = f'%Y, {author}'
+copyright = f'%Y, {config.author}'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

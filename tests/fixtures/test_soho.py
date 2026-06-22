@@ -3,6 +3,9 @@
 # Standard Library
 import importlib
 
+# Third Party
+import pytest
+
 # pytest-houdini
 import pytest_houdini.fixtures.soho
 
@@ -14,7 +17,7 @@ pytest_plugins = ["pytester"]
 # Tests
 
 
-def test_patch_soho(pytester):
+def test_patch_soho(pytester: pytest.Pytester) -> None:
     """Test the 'patch_soho' fixture."""
     pytester.makepyfile("""
 import hou
