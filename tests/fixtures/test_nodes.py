@@ -5,10 +5,15 @@ from __future__ import annotations
 
 # Standard Library
 import importlib
+from contextlib import nullcontext
 from typing import TYPE_CHECKING
+
+# Third Party
+import pytest
 
 # pytest-houdini
 import pytest_houdini.fixtures.nodes
+from pytest_houdini.fixtures.exceptions import UnsupportedCategoryError
 
 # Houdini
 import hou
@@ -16,14 +21,46 @@ import hou
 if TYPE_CHECKING:
     from pathlib import Path
 
-    import pytest
-
 importlib.reload(pytest_houdini.fixtures.nodes)
 
 pytest_plugins = ["pytester"]
 
 
 # Tests
+
+
+@pytest.mark.parametrize(
+    "category_name, raiser, expected",
+    [
+        ("Object", nullcontext(), hou.nodeType("Object/subnet")),
+        ("Driver", nullcontext(), hou.nodeType("Driver/subnet")),
+        ("Lop", nullcontext(), hou.nodeType("Lop/subnet")),
+        ("Shop", nullcontext(), hou.nodeType("Shop/material")),
+        ("Vop", nullcontext(), hou.nodeType("Vop/subnet")),
+        ("Cop2", nullcontext(), hou.nodeType("CopNet/img")),
+        ("Cop", nullcontext(), hou.nodeType("CopNet/copnet")),
+        ("Sop", nullcontext(), hou.nodeType("Object/geo")),
+        ("Dop", nullcontext(), hou.nodeType("Object/dopnet")),
+        ("Top", nullcontext(), hou.nodeType("Object/topnet")),
+        ("Manager", pytest.raises(UnsupportedCategoryError), None),
+    ],
+)
+def test__context_container(
+    category_name: str,
+    raiser: nullcontext[None] | pytest.RaisesExc[UnsupportedCategoryError],
+    expected: hou.nodeType | None,
+) -> None:
+    """Test pytest_houdini.fixtures.nodes._context_container()."""
+    category = hou.nodeTypeCategories().get(category_name)
+
+    if category is None:
+        pytest.skip(f"Category {category_name} not available in {hou.applicationVersionString()}")
+
+    with raiser:
+        container = pytest_houdini.fixtures.nodes._context_container(category)
+        assert container.type() == expected
+
+        container.destroy()
 
 
 def test_create_temp_node(pytester: pytest.Pytester) -> None:

@@ -14,8 +14,8 @@ import pytest
 from pytest_houdini.fixtures.exceptions import (
     NoTestNodeError,
     TestNodeDoesNotContainSOPsError,
+    UnsupportedCategoryError,
 )
-from pytest_houdini.tools import context_container
 
 # Houdini
 import hou
@@ -23,6 +23,26 @@ import hou
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
 
+
+# Globals
+
+# Known types that can be created with their parent/node type.
+_CREATABLE_CATEGORY_MAPPINGS = {
+    "Cop2": ("/img", "img"),
+    "Cop": ("/img", "copnet"),
+    "Sop": ("/obj", "geo"),
+    "Dop": ("/obj", "dopnet"),
+    "Top": ("/obj", "topnet"),
+}
+
+# Types that can map directly to default scene nodes.
+_DIRECT_CATEGORY_MAPPINGS = {
+    "Driver": hou.node("/out"),
+    "Lop": hou.node("/stage"),
+    "Object": hou.node("/obj"),
+    "Shop": hou.node("/shop"),
+    "Vop": hou.node("/mat"),
+}
 
 # Classes
 
@@ -36,6 +56,36 @@ class CallableToCreateTempNode(Protocol):
 
 
 # Non-Public Functions
+
+
+def _context_container(category: hou.NodeTypeCategory) -> hou.OpNode:
+    """Create an appropriate node to create a node of the provided category under.
+
+    Args:
+        category: The node type category of the node to create.
+
+    Returns:
+        An appropriate parent node to create a node of the desired type under.
+
+    Raises:
+        ValueError: Raised if the category does not correspond to a known type.
+    """
+    category_name = category.name()
+
+    container = _DIRECT_CATEGORY_MAPPINGS.get(category_name)
+
+    # If there was a direct mapping, then use it.
+    if container is not None:
+        return container.createNode("subnet")
+
+    # Otherwise, check for specific contexts and create the requisite node
+    # of a matching context.
+    create_data = _CREATABLE_CATEGORY_MAPPINGS.get(category_name)
+
+    if create_data is not None:
+        return hou.node(create_data[0]).createNode(create_data[1])
+
+    raise UnsupportedCategoryError(category)
 
 
 def _find_matching_node(parent: hou.OpNode, request: pytest.FixtureRequest) -> hou.OpNode:
@@ -141,10 +191,10 @@ def create_context_container() -> Iterator[Callable[[hou.NodeTypeCategory], hou.
         Returns:
             An appropriate parent node to create a node of the desired type under.
         """
-        with context_container(category, destroy=False) as container:
-            created_nodes_.append(container)
+        container = _context_container(category)
+        created_nodes_.append(container)
 
-            return container
+        return container
 
     yield _create
 

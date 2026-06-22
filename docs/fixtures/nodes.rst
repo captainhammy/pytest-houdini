@@ -48,8 +48,10 @@ destroys a node, the :exc:`hou.ObjectWasDeleted` exception will be suppressed.
 create_context_container
 ------------------------
 
-The :func:`~pytest_houdini.fixtures.nodes.create_context_container` fixture is an amalgamation of the :func:`~pytest_houdini.fixtures.nodes.create_temp_node` fixture and
-the :func:`~pytest_houdini.tools.context_container` context manager; it creates a container to create nodes of a type under and deletes it after the test is run.
+The :func:`~pytest_houdini.fixtures.nodes.create_context_container` fixture  provides an appropriate parent node
+(container) for which you can create a child node of a particular type. Pass the node type category of the type you wish
+to create and use the returned node to create additional nodes under. The created parent node is destroyed after the test
+finishes.
 
 The callable fixture takes a :class:`hou.NodeTypeCategory`.
 
@@ -59,6 +61,32 @@ The callable fixture takes a :class:`hou.NodeTypeCategory`.
         container = create_context_container(hou.sopNodeTypeCategory())
         node = container.createNode("box")
         ... # do testing
+
+.. list-table:: Container node types
+    :header-rows: 1
+
+    * - Context
+      - Container Node Type
+    * - Cop
+      - CopNet/copnet
+    * - Cop2
+      - CopNet/img
+    * - Dop
+      - Object/dopnet
+    * - Driver
+      - Driver/subnet
+    * - Lop
+      - Lop/subnet
+    * - Object
+      - Object/subnet
+    * - Shop
+      - Shop/material
+    * - Sop
+      - Object/geo
+    * - Top
+      - Object/topnet
+    * - Vop
+      - Vop/subnet
 
 
 Existing Test Node Fixtures

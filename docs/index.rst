@@ -10,5 +10,4 @@ This `pytest <http://pytest.org>`_ plugin provides fixtures and utilities for te
    :caption: Contents:
 
    fixtures/index.rst
-   tools
    api/modules
